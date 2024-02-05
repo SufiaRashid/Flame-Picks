@@ -41,12 +41,18 @@
         <div class="navbar-nav">
           {% if user.is_authenticated %}
           <!-- only show if user is logged in -->
-          <a class="nav-item nav-link" id="home" href="/">Home</a>
-          <a class="nav-item nav-link" id="colorBlind" href="/blackandwhite"
-            >Black and White</a
+          <a class="nav-item nav-link" id="home" href="/">Make Picks</a>
+          <a class="nav-item nav-link" id="leaderboard" href="/blackandwhite"
+            >LeaderBoard</a
           >
-          <a class="nav-item nav-link" id="colorBlindTwo" href="/blueandyellow"
-            >Blue and Yellow</a
+          <a class="nav-item nav-link" id="account" href="/blueandyellow"
+            >Account</a
+          >
+          <a class="nav-item nav-link" id="settings" href="/blueandyellow"
+            >Settings</a
+          >
+          <a class="nav-item nav-link" id="support" href="/blueandyellow"
+            >Support</a
           >
           <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
           {% else %}
