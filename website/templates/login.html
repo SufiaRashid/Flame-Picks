@@ -1,0 +1,34 @@
+{% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
+%}
+<h5 align="center" style="color: rgb(205, 77, 98)">Returning users welcome!</h5>
+
+<!-- all boxes and labels created for login page -->
+<form method="POST">
+  <h3 align="center" style="color: rgb(103, 162, 87)">Login</h3>
+  <div class="form-group">
+    <!-- creating box and label for email input, sending data to backend-->
+    <label for="email">Email Address</label>
+    <input
+      type="email"
+      class="form-control"
+      id="email"
+      name="email"
+      placeholder="Enter email"
+    />
+  </div>
+  <div class="form-group">
+    <!-- creating box and label for password1 input, sending data to backend-->
+    <label for="password1">Password</label>
+    <input
+      type="password"
+      class="form-control"
+      id="password1"
+      name="password1"
+      placeholder="Enter password"
+      style="color: rgb(205, 77, 98)"
+    />
+  </div>
+  <br />
+  <button type="submit" class="btn btn-primary">Login</button>
+</form>
+{% endblock %}
