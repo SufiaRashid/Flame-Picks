@@ -42,18 +42,14 @@
           {% if user.is_authenticated %}
           <!-- only show if user is logged in -->
           <a class="nav-item nav-link" id="home" href="/">Make Picks</a>
-          <a class="nav-item nav-link" id="leaderboard" href="/blackandwhite"
+          <a class="nav-item nav-link" id="leaderboard" href="/leaderboard"
             >LeaderBoard</a
           >
-          <a class="nav-item nav-link" id="account" href="/blueandyellow"
-            >Account</a
-          >
-          <a class="nav-item nav-link" id="settings" href="/blueandyellow"
+          <a class="nav-item nav-link" id="account" href="/account">Account</a>
+          <a class="nav-item nav-link" id="settings" href="/settings"
             >Settings</a
           >
-          <a class="nav-item nav-link" id="support" href="/blueandyellow"
-            >Support</a
-          >
+          <a class="nav-item nav-link" id="support" href="/support">Support</a>
           <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
           {% else %}
           <!-- only show if not logged in -->
