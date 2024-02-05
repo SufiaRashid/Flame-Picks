@@ -4,8 +4,8 @@ A sports prediction web app for tracking and comparing your predictions with fri
 
 # Instructions
 
-git clone https://github.com/gator-chomp/palette-swapper.git
-pip install -r requirements.txt
-flask --app main.py run
+S1: git clone https://github.com/gator-chomp/palette-swapper.git
+S2: pip install -r requirements.txt
+S3: flask --app main.py run
 (if issues with access to local host, try different port number)
 ex) flask --app main.py run -h localhost -p 3000
