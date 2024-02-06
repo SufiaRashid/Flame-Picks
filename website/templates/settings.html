@@ -2,4 +2,182 @@
 content %}
 <body style="background-color: #84cebc"></body>
 <h5 align="center" style="color: rgb(43, 57, 55)">flame picks settings page</h5>
+<ol>
+  <li>
+    <h2>General Settings:</h2>
+    <ul>
+      <li>Site title and tagline</li>
+      <li>Site URL</li>
+      <li>Timezone settings</li>
+      <li>Date and time format</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Site Identity:</h2>
+    <ul>
+      <li>Logo and site icon</li>
+      <li>Favicon</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Reading Settings:</h2>
+    <ul>
+      <li>Homepage displays (static page or latest posts)</li>
+      <li>Number of blog posts to show on the homepage</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Writing Settings:</h2>
+    <ul>
+      <li>Default post category and format</li>
+      <li>Default post editor</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Discussion Settings:</h2>
+    <ul>
+      <li>Comment settings (enable/disable comments, moderation settings)</li>
+      <li>Avatar display settings</li>
+      <li>Comment form settings</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Permalinks:</h2>
+    <ul>
+      <li>URL structure for posts and pages</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Media Settings:</h2>
+    <ul>
+      <li>Image sizes and thumbnail settings</li>
+      <li>Default image alignment</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Privacy Settings:</h2>
+    <ul>
+      <li>Privacy policy page</li>
+      <li>Cookie consent settings</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Security Settings:</h2>
+    <ul>
+      <li>Two-factor authentication settings</li>
+      <li>User roles and permissions</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>SEO Settings:</h2>
+    <ul>
+      <li>Meta tags (title, description, keywords)</li>
+      <li>Sitemap submission settings</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Analytics Integration:</h2>
+    <ul>
+      <li>Google Analytics tracking code</li>
+      <li>Integration with other analytics platforms</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Customization Settings:</h2>
+    <ul>
+      <li>Theme customization options (colors, fonts, layout)</li>
+      <li>Custom CSS/JS code</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Backup and Restore Settings:</h2>
+    <ul>
+      <li>Backup frequency and storage location</li>
+      <li>Restore options</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>API Settings:</h2>
+    <ul>
+      <li>Integration with third-party services via API keys</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>User Profile Settings:</h2>
+    <ul>
+      <li>Profile information (name, email, bio)</li>
+      <li>Avatar or profile picture</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Email Settings:</h2>
+    <ul>
+      <li>SMTP configuration for outgoing emails</li>
+      <li>Email notifications settings</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Language and Localization Settings:</h2>
+    <ul>
+      <li>Site language</li>
+      <li>Time and date formats specific to the locale</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Accessibility Settings:</h2>
+    <ul>
+      <li>Font size and contrast options</li>
+      <li>Keyboard navigation settings</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Plugin Settings:</h2>
+    <ul>
+      <li>Configuration settings for installed plugins</li>
+    </ul>
+  </li>
+
+  <li>
+    <h2>Debugging and Maintenance Settings:</h2>
+    <ul>
+      <li>Debug mode settings</li>
+      <li>Maintenance mode settings</li>
+    </ul>
+  </li>
+</ol>
+
+<script>
+  var acc = document.getElementsByClassName("accordion");
+  var i;
+
+  for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var panel = this.nextElementSibling;
+      if (panel.style.maxHeight) {
+        panel.style.maxHeight = null;
+      } else {
+        panel.style.maxHeight = panel.scrollHeight + "px";
+      }
+    });
+  }
+</script>
 {% endblock %}
