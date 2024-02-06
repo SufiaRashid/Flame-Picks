@@ -1,10 +1,12 @@
 {% extends "base.html" %} {% block title %}Sign Up{% endblock %} {% block
 content %}
-<h5 align="center" style="color: rgb(103, 162, 87)">New users welcome!</h5>
+<h5 align="center" style="color: rgb(43, 57, 55)">
+  Join our Flame Picks family!
+</h5>
 
 <!-- all boxes and labels created for signup page -->
 <form method="POST">
-  <h3 align="center" style="color: rgb(205, 77, 98)">Sign Up</h3>
+  <h3 align="center" style="color: rgb(30, 139, 121)">Sign Up</h3>
   <div class="form-group">
     <!-- creating box and label for email input, sending data to backend-->
     <label for="email">Email Address</label>
@@ -14,6 +16,7 @@ content %}
       id="email"
       name="email"
       placeholder="Enter email"
+      style="color: rgb(63, 75, 21)"
     />
   </div>
   <div class="form-group">
@@ -25,6 +28,7 @@ content %}
       id="firstName"
       name="firstName"
       placeholder="Enter first name"
+      style="color: rgb(63, 75, 21)"
     />
   </div>
   <div class="form-group">
@@ -36,6 +40,7 @@ content %}
       id="lastName"
       name="lastName"
       placeholder="Enter last name"
+      style="color: rgb(63, 75, 21)"
     />
   </div>
   <div class="form-group">
@@ -47,6 +52,7 @@ content %}
       id="password1"
       name="password1"
       placeholder="Enter password"
+      style="color: rgb(63, 75, 21)"
     />
   </div>
   <div class="form-group">
@@ -58,10 +64,13 @@ content %}
       id="password2"
       name="password2"
       placeholder="Re-enter password"
+      style="color: rgb(63, 75, 21)"
     />
   </div>
   <br />
-  <button type="submit" class="btn btn-primary">Create Account</button>
+  <button type="submit" class="btn btn-info">
+    <i class="fa fa-fw fa-user"></i>Create Account
+  </button>
   <!-- button will send everything to backend check when pressed -->
 </form>
 {% endblock %}
