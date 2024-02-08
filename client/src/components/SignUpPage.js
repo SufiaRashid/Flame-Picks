@@ -17,6 +17,9 @@ const SignUpPage = ({ isAuthenticated, user }) => {
 
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
+      <div align="center">
+        <img src="/kitty2.jpg" style={{ width: '200px', height: 'auto' }} alt="Avatar" className="avatar" />
+      </div>
       <div>
         <h5 align="center" style={{ color: 'rgb(43, 57, 55)' }}>
           Join our Flame Picks family!
