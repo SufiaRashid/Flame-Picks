@@ -10,6 +10,7 @@ from flask_cors import CORS
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
+
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'candy'
@@ -18,6 +19,11 @@ def create_app():
     CORS(app)
 
     from .auth import auth #import auth
+
+    from flask_jwt_extended import JWTManager
+
+    app.config['JWT_SECRET_KEY'] = 'cake'
+    jwt = JWTManager(app)
 
     app.register_blueprint(auth, url_prefix = '/')
 

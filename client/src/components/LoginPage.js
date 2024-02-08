@@ -1,19 +1,43 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import BaseLayout from './BaseLayout';
 
-const LoginPage = ({ isAuthenticated, user }) => {
+const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState({ type: '', content: '' });
+  const navigate = useNavigate();
+  const { setAuthData } = useAuth();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Here, you would typically send a request to your Flask API for login
-    console.log('Submitting', email, password);
-    // Implement login logic...
+    setMessage({ type: '', content: '' });
+
+    try {
+      const response = await axios.post('http://localhost:5000/login', {
+        email,
+        password
+      });
+      const { access_token } = response.data;
+      localStorage.setItem('token', access_token);
+
+      setAuthData({ isAuthenticated: true, token: access_token });
+
+      navigate('/home');
+      setMessage({ type: 'success', content: 'Logged in successfully!' });
+    } catch (error) {
+      if (error.response) {
+        setMessage({ type: 'error', content: error.response.data.error });
+      } else {
+        setMessage({ type: 'error', content: 'An error occurred. Please try again.' });
+      }
+    }
   };
 
   return (
-    <BaseLayout isAuthenticated={isAuthenticated} user={user}>
+    <BaseLayout>
       <div align="center">
         <img src="/kitty.jpg" style={{ width: '200px', height: 'auto' }} alt="Avatar" className="avatar" />
       </div>
@@ -21,6 +45,11 @@ const LoginPage = ({ isAuthenticated, user }) => {
         <h5 align="center" style={{ color: 'rgb(43, 57, 55)' }}>
           Welcome returning sports lovers!
         </h5>
+        {message.content && (
+          <div className={`alert ${message.type === 'error' ? 'alert-danger' : 'alert-success'}`} role="alert">
+            {message.content}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <h3 align="center" style={{ color: 'rgb(30, 139, 121)' }}>Login</h3>
           <div className="form-group">
@@ -31,20 +60,18 @@ const LoginPage = ({ isAuthenticated, user }) => {
               id="email"
               name="email"
               placeholder="Enter email"
-              style={{ color: 'rgb(63, 75, 21)' }}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password1">Password</label>
+            <label htmlFor="password">Password</label>
             <input
               type="password"
               className="form-control"
-              id="password1"
-              name="password1"
+              id="password"
+              name="password"
               placeholder="Enter password"
-              style={{ color: 'rgb(63, 75, 21)' }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

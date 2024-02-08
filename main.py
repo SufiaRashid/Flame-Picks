@@ -1,6 +1,6 @@
 #main file which runs the app
 
-from website import create_app
+from api import create_app
 
 app = create_app()
 
