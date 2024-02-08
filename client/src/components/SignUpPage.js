@@ -1,18 +1,39 @@
 import React, { useState } from 'react';
 import BaseLayout from './BaseLayout';
+import axios from 'axios';
 
 const SignUpPage = ({ isAuthenticated, user }) => {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [password1, setPassword] = useState('');
+  const [password2, setPasswordConfirm] = useState('');
+  const [message, setMessage] = useState({ type: '', content: '' });
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Here, you would send a request to your Flask API to create a new user
-    console.log('SignUp Info:', { email, firstName, lastName, password, passwordConfirm });
-    // Implement sign-up logic...
+    setMessage({ type: '', content: '' }); // Reset the message state before new submission
+    try {
+      const response = await axios.post('http://localhost:5000/sign-up', {
+        email,
+        firstName,
+        lastName,
+        password1,
+        password2
+      });
+      // Handle success
+      console.log(response.data);
+      setMessage({ type: 'success', content: 'Account created successfully!' });
+    } catch (error) {
+      // Handle errors
+      if (error.response) {
+        console.error('SignUp error:', error.response.data);
+        setMessage({ type: 'error', content: error.response.data.error });
+      } else {
+        console.error('SignUp error:', error.message);
+        setMessage({ type: 'error', content: 'An error occurred. Please try again.' });
+      }
+    }
   };
 
   return (
@@ -24,6 +45,11 @@ const SignUpPage = ({ isAuthenticated, user }) => {
         <h5 align="center" style={{ color: 'rgb(43, 57, 55)' }}>
           Join our Flame Picks family!
         </h5>
+        {message.content && (
+          <div className={`alert ${message.type === 'error' ? 'alert-danger' : 'alert-success'}`} role="alert">
+            {message.content}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <h3 align="center" style={{ color: 'rgb(30, 139, 121)' }}>Sign Up</h3>
           <div className="form-group">
@@ -34,7 +60,6 @@ const SignUpPage = ({ isAuthenticated, user }) => {
               id="email"
               name="email"
               placeholder="Enter email"
-              style={{ color: 'rgb(63, 75, 21)' }}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -47,7 +72,6 @@ const SignUpPage = ({ isAuthenticated, user }) => {
               id="firstName"
               name="firstName"
               placeholder="Enter first name"
-              style={{ color: 'rgb(63, 75, 21)' }}
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
@@ -60,7 +84,6 @@ const SignUpPage = ({ isAuthenticated, user }) => {
               id="lastName"
               name="lastName"
               placeholder="Enter last name"
-              style={{ color: 'rgb(63, 75, 21)' }}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
             />
@@ -73,8 +96,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
               id="password1"
               name="password1"
               placeholder="Enter password"
-              style={{ color: 'rgb(63, 75, 21)' }}
-              value={password}
+              value={password1}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
@@ -86,8 +108,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
               id="password2"
               name="password2"
               placeholder="Re-enter password"
-              style={{ color: 'rgb(63, 75, 21)' }}
-              value={passwordConfirm}
+              value={password2}
               onChange={(e) => setPasswordConfirm(e.target.value)}
             />
           </div>
