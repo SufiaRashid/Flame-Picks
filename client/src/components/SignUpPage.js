@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BaseLayout from './BaseLayout';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
 const SignUpPage = ({ isAuthenticated, user }) => {
@@ -9,6 +11,14 @@ const SignUpPage = ({ isAuthenticated, user }) => {
   const [password1, setPassword] = useState('');
   const [password2, setPasswordConfirm] = useState('');
   const [message, setMessage] = useState({ type: '', content: '' });
+  const navigate = useNavigate();
+  const { setAuthData } = useAuth();
+
+  useEffect(() => {
+    localStorage.removeItem('token');
+    setAuthData({ isAuthenticated: false, token: null });
+    console.log('Authentication state cleared');
+  }, [setAuthData]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

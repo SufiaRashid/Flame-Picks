@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,12 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { setAuthData } = useAuth();
 
+  useEffect(() => {
+    localStorage.removeItem('token');
+    setAuthData({ isAuthenticated: false, token: null });
+    console.log('Authentication state cleared');
+  }, [setAuthData]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage({ type: '', content: '' });
@@ -22,7 +28,7 @@ const LoginPage = () => {
       });
       const { access_token } = response.data;
       localStorage.setItem('token', access_token);
-
+      console.log('Token stored in localStorage:', access_token);
       setAuthData({ isAuthenticated: true, token: access_token });
 
       navigate('/home');
