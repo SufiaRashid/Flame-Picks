@@ -5,6 +5,10 @@ import LoginPage from "./components/LoginPage";
 import SignUpPage from "./components/SignUpPage";
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from "./context/AuthContext";
+import AccountPage from "./components/AccountPage";
+import Leaderboard from "./components/Leaderboard";
+import SettingsPage from "./components/SettingsPage";
+import SupportPage from "./components/SupportPage";
 
 function App() {
   return (
@@ -17,6 +21,38 @@ function App() {
             element={
               <ProtectedRoute>
                 <HomePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/account" 
+            element={
+              <ProtectedRoute>
+                <AccountPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/leaderboard" 
+            element={
+              <ProtectedRoute>
+                <Leaderboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/support" 
+            element={
+              <ProtectedRoute>
+                <SupportPage />
               </ProtectedRoute>
             } 
           />
