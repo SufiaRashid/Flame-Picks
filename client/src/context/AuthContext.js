@@ -8,32 +8,35 @@ export const AuthProvider = ({ children }) => {
   const initialAuthState = {
     isAuthenticated: !!localStorage.getItem('token'),
     token: localStorage.getItem('token'),
+    user: JSON.parse(localStorage.getItem('user')),
   };
-
+  
   const [authData, setAuthData] = useState(initialAuthState);
 
   useEffect(() => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem('token');
-      console.log('Token from localStorage:', token);
-      if (token) {
-        // Update auth state based on token presence without backend validation
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (token && user) {
         setAuthData({
           isAuthenticated: true,
           token: token,
+          user: user,
         });
-        console.log('Auth state set to authenticated');
-      }
-      else {
-        console.log('No token found, user not authenticated');
       }
     };
 
     checkAuthStatus();
   }, []);
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setAuthData({ isAuthenticated: false, token: null, user: null });
+  };
+
   return (
-    <AuthContext.Provider value={{ authData, setAuthData }}>
+    <AuthContext.Provider value={{ authData, setAuthData, logout }}>
       {children}
     </AuthContext.Provider>
   );

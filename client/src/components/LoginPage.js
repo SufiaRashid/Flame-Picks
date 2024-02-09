@@ -22,14 +22,11 @@ const LoginPage = () => {
     setMessage({ type: '', content: '' });
 
     try {
-      const response = await axios.post('http://localhost:5000/login', {
-        email,
-        password
-      });
-      const { access_token } = response.data;
+      const response = await axios.post('http://localhost:5000/login', { email, password });
+      const { access_token, user } = response.data;
       localStorage.setItem('token', access_token);
-      console.log('Token stored in localStorage:', access_token);
-      setAuthData({ isAuthenticated: true, token: access_token });
+      localStorage.setItem('user', JSON.stringify(user));
+      setAuthData({ isAuthenticated: true, token: access_token, user: user });
 
       navigate('/home');
       setMessage({ type: 'success', content: 'Logged in successfully!' });
