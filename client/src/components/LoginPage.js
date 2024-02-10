@@ -21,15 +21,24 @@ const LoginPage = () => {
     event.preventDefault();
     setMessage({ type: '', content: '' });
 
+    if (password.length < 8) {
+      setMessage({ type: 'error', content: 'Password must be at least 8 characters long.' });
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:5000/login', { email, password });
       const { access_token, user } = response.data;
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setAuthData({ isAuthenticated: true, token: access_token, user: user });
 
-      navigate('/home');
-      setMessage({ type: 'success', content: 'Logged in successfully!' });
+      setMessage({ type: 'success', content: 'Login successful! Redirecting...' });
+
+      setTimeout(() => {
+        localStorage.setItem('token', access_token);
+        localStorage.setItem('user', JSON.stringify(user));
+        setAuthData({ isAuthenticated: true, token: access_token, user: user });
+  
+        navigate('/home');
+      }, 1500);
     } catch (error) {
       if (error.response) {
         setMessage({ type: 'error', content: error.response.data.error });
