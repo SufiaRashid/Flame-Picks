@@ -12,7 +12,7 @@ A sports prediction web app for tracking and comparing your predictions with fri
 - Install from requirements.txt: ```pip install -r requirements.txt```
 - Navigate to client folder: ```cd client```
 - Install packages: ```npm install```
-## Step 3 - Running application:
+## Step Three - Running application:
 - Navigate back to root: ```cd ..```
 - Run start.sh to run application: ```./start.sh``` or ```sh start.sh``` depending on the environment
 ## Issues
