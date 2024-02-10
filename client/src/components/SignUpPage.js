@@ -22,27 +22,41 @@ const SignUpPage = ({ isAuthenticated, user }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage({ type: '', content: '' }); // Reset the message state before new submission
+    setMessage({ type: '', content: '' });
+
+    if (password1 !== password2) {
+      setMessage({ type: 'error', content: 'Passwords do not match.' });
+      return;
+    }
+
+    if (password1.length < 8) {
+      setMessage({ type: 'error', content: 'Password must be at least 8 characters long.' });
+      return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:5000/sign-up', {
+      const signUpResponse = await axios.post('http://localhost:5000/sign-up', {
         email,
         firstName,
         lastName,
         password1,
-        password2
+        password2,
       });
-      // Handle success
-      console.log(response.data);
-      setMessage({ type: 'success', content: 'Account created successfully!' });
-    } catch (error) {
-      // Handle errors
-      if (error.response) {
-        console.error('SignUp error:', error.response.data);
-        setMessage({ type: 'error', content: error.response.data.error });
-      } else {
-        console.error('SignUp error:', error.message);
-        setMessage({ type: 'error', content: 'An error occurred. Please try again.' });
+
+      if (signUpResponse.status === 201) {
+        const loginResponse = await axios.post('http://localhost:5000/login', { email, password: password1 });
+        const { access_token, user } = loginResponse.data;
+
+        localStorage.setItem('token', access_token);
+        localStorage.setItem('user', JSON.stringify(user));
+        setAuthData({ isAuthenticated: true, token: access_token, user: user });
+
+        setMessage({ type: 'success', content: 'Account created successfully! Logging you in...' });
+        setTimeout(() => navigate('/home'), 2000);
       }
+    } catch (error) {
+      const errorMessage = error.response && error.response.data ? error.response.data.error : 'An error occurred. Please try again.';
+      setMessage({ type: 'error', content: errorMessage });
     }
   };
 
