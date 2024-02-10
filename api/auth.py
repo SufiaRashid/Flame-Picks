@@ -19,16 +19,9 @@ def login():
         return jsonify(access_token=access_token, user={"firstName": user.firstName, "lastName": user.lastName, "email": user.email}), 200
     return jsonify({'error': 'Invalid credentials'}), 401
 
-
-@auth.route('/logout', methods=['POST'])
-def logout():
-    #fix this
-    return jsonify({'message': 'Logged out successfully!'}), 200
-
 @auth.route('/sign-up', methods=['POST'])
 def sign_up():
     data = request.get_json()
-    print(data)
     email = data.get('email')
     first_name = data.get('firstName', '') 
     last_name = data.get('lastName', '')

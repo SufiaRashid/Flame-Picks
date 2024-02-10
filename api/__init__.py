@@ -3,8 +3,6 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import path
-from flask_login import LoginManager
 from flask_cors import CORS
 
 db = SQLAlchemy()
@@ -23,11 +21,9 @@ def create_app():
     from flask_jwt_extended import JWTManager
 
     app.config['JWT_SECRET_KEY'] = 'cake'
-    jwt = JWTManager(app)
+    JWTManager(app)
 
     app.register_blueprint(auth, url_prefix = '/')
-
-    from .models import User
 
     with app.app_context():
         db.create_all()
