@@ -27,7 +27,7 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/login', { email, password });
+      const response = await axios.post('http://localhost:5001/login', { email, password });
       const { access_token, user } = response.data;
 
       setMessage({ type: 'success', content: 'Login successful! Redirecting...' });
