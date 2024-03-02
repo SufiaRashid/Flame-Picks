@@ -35,7 +35,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
     }
 
     try {
-      const signUpResponse = await axios.post('http://localhost:5000/sign-up', {
+      const signUpResponse = await axios.post('http://localhost:5001/sign-up', {
         email,
         firstName,
         lastName,
@@ -44,7 +44,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
       });
 
       if (signUpResponse.status === 201) {
-        const loginResponse = await axios.post('http://localhost:5000/login', { email, password: password1 });
+        const loginResponse = await axios.post('http://localhost:5001/login', { email, password: password1 });
         const { access_token, user } = loginResponse.data;
 
         localStorage.setItem('token', access_token);
