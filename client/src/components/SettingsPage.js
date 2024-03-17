@@ -1,60 +1,113 @@
-import React, { useState, useEffect } from 'react';
-import BaseLayout from './BaseLayout';
+import React, { useState, useEffect, useContext } from "react";
+import BaseLayout from "./BaseLayout";
+import { useAuth } from "../context/AuthContext";
+import { FaPlus } from "react-icons/fa";
+import { FaMinus } from "react-icons/fa6";
 
 const Accordion = ({ title, children }) => {
-    const [isOpen, setIsOpen] = useState(false);
-  
-    const toggle = () => {
-      setIsOpen(!isOpen);
-    };
-  
-    return (
-      <>
-        <button className="accordion" onClick={toggle}>{title}</button>
-        <div className={`panel ${isOpen ? 'show' : ''}`} style={{ maxHeight: isOpen ? '100%' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease' }}>
-          {children}
-        </div>
-      </>
-    );
-  };
-  
+  const [isOpen, setIsOpen] = useState(false);
 
-const SettingsPage = () => {
-    useEffect(() => {
+  const toggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <>
+      <div className="accordion-wrapper" onClick={toggle}>
+        <button className="accordion">{title}</button>
+        <span>{isOpen ? <FaMinus /> : <FaPlus />}</span>
+      </div>
+      <div
+        className={`panel ${isOpen ? "show" : ""}`}
+        style={{
+          maxHeight: isOpen ? "100%" : "0",
+          overflow: "hidden",
+          transition: "max-height 0.3s ease",
+        }}
+      >
+        {children}
+      </div>
+    </>
+  );
+};
+
+const SettingsPage = ({ children }) => {
+  const { isDarkMode, setIsDarkMode } = useAuth();
+  // const { isDarkMode, setIsDarkMode } = useContext(AuthProvider);
+  /*useEffect(() => {
         document.body.classList.add("settings-page-bg");
 
         return () => {
             document.body.classList.remove("settings-page-bg");
         };
-    }, []);
+      }, []);*/
 
-    return (
-        <BaseLayout>
-      <div style={{ backgroundColor: 'hsl(180, 15%, 54%)', minHeight: '100vh', padding: '20px' }}>
-        <h5 align="center" style={{ color: 'rgb(43, 57, 55)' }}>
+  useEffect(() => {
+    document.body.style.backgroundColor = isDarkMode ? "grey" : "white";
+
+    // return () => {
+    //   document.body.style.backgroundColor = "";
+    // };
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  return (
+    <BaseLayout>
+      <div
+        style={{
+          backgroundColor: "hsl(180, 15%, 54%)",
+          minHeight: "100vh",
+          padding: "20px",
+        }}
+      >
+        <h5 align="center" style={{ color: isDarkMode ? "white" : "black" }}>
           Flame Picks Settings Page
         </h5>
-        <ol style={{ color: '#000000d0', fontFamily: "'Times New Roman', Times, serif", fontSize: '150%' }}>
+        <ol
+          style={{
+            color: "#000000d0",
+            fontFamily: "'Times New Roman', Times, serif",
+            fontSize: "150%",
+          }}
+        >
           <Accordion title="General Settings">
             <ul>
+              <li>
+                <label>
+                  Dark mode
+                  <input
+                    type="checkbox"
+                    checked={isDarkMode}
+                    onChange={toggleDarkMode}
+                  />
+                  <span></span>
+                </label>
+              </li>
               <li>Site title and tagline</li>
               <li>Site URL</li>
               <li>Timezone settings</li>
               <li>Date and time format</li>
-              <li><a href="https://www.freepik.com/free-vector/cute-cat-cartoon-character_45188752.htm#page=2&query=cat%20clipart&position=3&from_view=search&track=ais&uuid=234b2f64-1ae7-42ff-b5a9-f3a54eb7e393">Image by brgfx</a> on Freepik</li>
-              <li><a href="https://www.freepik.com/free-vector/cute-black-kitten-sitting-pose_43941387.htm#page=2&query=cat&position=4&from_view=author&uuid=e2b6486b-a4a3-41b4-aa88-8ad098501516">Image by brgfx</a> on Freepik</li>
+              <li>
+                <a href="https://www.freepik.com/free-vector/cute-cat-cartoon-character_45188752.htm#page=2&query=cat%20clipart&position=3&from_view=search&track=ais&uuid=234b2f64-1ae7-42ff-b5a9-f3a54eb7e393">
+                  Image by brgfx
+                </a>{" "}
+                on Freepik
+              </li>
+              <li>
+                <a href="https://www.freepik.com/free-vector/cute-black-kitten-sitting-pose_43941387.htm#page=2&query=cat&position=4&from_view=author&uuid=e2b6486b-a4a3-41b4-aa88-8ad098501516">
+                  Image by brgfx
+                </a>{" "}
+                on Freepik
+              </li>
             </ul>
           </Accordion>
           <Accordion title="Site Identity">
             <ul>
               <li>Logo and site icon</li>
               <li>Favicon</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Reading Settings">
-            <ul>
-              <li>Homepage displays (static page or latest posts)</li>
-              <li>Number of blog posts to show on the homepage</li>
             </ul>
           </Accordion>
           <Accordion title="Writing Settings">
@@ -65,7 +118,9 @@ const SettingsPage = () => {
           </Accordion>
           <Accordion title="Discussion Settings">
             <ul>
-              <li>Comment settings (enable/disable comments, moderation settings)</li>
+              <li>
+                Comment settings (enable/disable comments, moderation settings)
+              </li>
               <li>Avatar display settings</li>
               <li>Comment form settings</li>
             </ul>
@@ -154,7 +209,7 @@ const SettingsPage = () => {
         </ol>
       </div>
     </BaseLayout>
-    );
+  );
 };
 
 export default SettingsPage;

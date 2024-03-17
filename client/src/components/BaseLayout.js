@@ -1,19 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
 import "https://code.jquery.com/jquery-3.5.1.slim.min.js";
 import "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js";
-import "https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js";
 
 const BaseLayout = ({ children }) => {
+  const [toggleMenu, setToggleMenu] = useState(false);
   const { authData, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const handleToggleMenu = () => {
+    setToggleMenu(!toggleMenu);
   };
 
   return (
@@ -31,10 +35,16 @@ const BaseLayout = ({ children }) => {
             aria-controls="navbarNavAltMarkup"
             aria-expanded="false"
             aria-label="Toggle navigation"
+            onClick={handleToggleMenu}
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div
+            className={
+              toggleMenu ? "navbar-collapse" : "collapse navbar-collapse"
+            }
+            id="navbarNavAltMarkup"
+          >
             <div className="navbar-nav me-auto mb-2 mb-lg-0">
               {authData.isAuthenticated ? (
                 <>
@@ -82,8 +92,9 @@ const BaseLayout = ({ children }) => {
           </div>
         </div>
       </nav>
-
-      <div className="container">{children}</div>
+      <div style={{ backgroundColor: "rgb(120, 155, 155)" }}>
+        <div className="container">{children}</div>
+      </div>
     </>
   );
 };
