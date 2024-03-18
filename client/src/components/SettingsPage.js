@@ -57,14 +57,17 @@ const SettingsPage = ({ children }) => {
   return (
     <BaseLayout>
       <div
+        className="fullPageDiv"
         style={{
           minHeight: "100vh",
           padding: "20px",
+          fontFamily: "'Times New Roman', Times, serif",
+          color: "#000000d0",
         }}
       >
-        <h5 align="center" style={{ color: isDarkMode ? "white" : "black" }}>
-          Flame Picks Settings Page
-        </h5>
+        <h1 align="center" style={{ color: isDarkMode ? "white" : "black" }}>
+          Settings Page
+        </h1>
         <ol
           style={{
             color: "#000000d0",
@@ -103,13 +106,13 @@ const SettingsPage = ({ children }) => {
               </li>
             </ul>
           </Accordion>
-          <Accordion title="Site Identity">
+          <Accordion title="Account Settings">
             <ul>
               <li>Logo and site icon</li>
               <li>Favicon</li>
             </ul>
           </Accordion>
-          <Accordion title="Writing Settings">
+          <Accordion title="Theme Settings">
             <ul>
               <li>Default post category and format</li>
               <li>Default post editor</li>
@@ -122,87 +125,6 @@ const SettingsPage = ({ children }) => {
               </li>
               <li>Avatar display settings</li>
               <li>Comment form settings</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Permalinks">
-            <ul>
-              <li>URL structure for posts and pages</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Media Settings">
-            <ul>
-              <li>Image sizes and thumbnail settings</li>
-              <li>Default image alignment</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Privacy Settings">
-            <ul>
-              <li>Privacy policy page</li>
-              <li>Cookie consent settings</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Security Settings">
-            <ul>
-              <li>Two-factor authentication settings</li>
-              <li>User roles and permissions</li>
-            </ul>
-          </Accordion>
-          <Accordion title="SEO Settings">
-            <ul>
-              <li>Meta tags (title, description, keywords)</li>
-              <li>Sitemap submission settings</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Analytics Integration">
-            <ul>
-              <li>Google Analytics tracking code</li>
-              <li>Integration with other analytics platforms</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Customization Settings">
-            <ul>
-              <li>Theme customization options (colors, fonts, layout)</li>
-              <li>Custom CSS/JS code</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Backup and Restore Settings">
-            <ul>
-              <li>Backup frequency and storage location</li>
-              <li>Restore options</li>
-            </ul>
-          </Accordion>
-          <Accordion title="API Settings">
-            <ul>
-              <li>Integration with third-party services via API keys</li>
-            </ul>
-          </Accordion>
-          <Accordion title="User Profile Settings">
-            <ul>
-              <li>Profile information (name, email, bio)</li>
-              <li>Avatar or profile picture</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Email Settings">
-            <ul>
-              <li>SMTP configuration for outgoing emails</li>
-              <li>Email notifications settings</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Language and Localization Settings">
-            <ul>
-              <li>Site language</li>
-              <li>Time and date formats specific to the locale</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Accessibility Settings">
-            <ul>
-              <li>Font size and contrast options</li>
-              <li>Keyboard navigation settings</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Plugin Settings">
-            <ul>
-              <li>Configuration settings for installed plugins</li>
             </ul>
           </Accordion>
         </ol>
