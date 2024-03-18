@@ -1,41 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import BaseLayout from './BaseLayout';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import BaseLayout from "./BaseLayout";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 const SignUpPage = ({ isAuthenticated, user }) => {
-  const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [password1, setPassword] = useState('');
-  const [password2, setPasswordConfirm] = useState('');
-  const [message, setMessage] = useState({ type: '', content: '' });
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [password1, setPassword] = useState("");
+  const [password2, setPasswordConfirm] = useState("");
+  const [message, setMessage] = useState({ type: "", content: "" });
   const navigate = useNavigate();
   const { setAuthData } = useAuth();
 
   useEffect(() => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setAuthData({ isAuthenticated: false, token: null });
-    console.log('Authentication state cleared');
+    console.log("Authentication state cleared");
   }, [setAuthData]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage({ type: '', content: '' });
+    setMessage({ type: "", content: "" });
 
     if (password1 !== password2) {
-      setMessage({ type: 'error', content: 'Passwords do not match.' });
+      setMessage({ type: "error", content: "Passwords do not match." });
       return;
     }
 
     if (password1.length < 8) {
-      setMessage({ type: 'error', content: 'Password must be at least 8 characters long.' });
+      setMessage({
+        type: "error",
+        content: "Password must be at least 8 characters long.",
+      });
       return;
     }
 
     try {
-      const signUpResponse = await axios.post('http://localhost:5001/sign-up', {
+      const signUpResponse = await axios.post("http://localhost:5001/sign-up", {
         email,
         firstName,
         lastName,
@@ -44,38 +47,59 @@ const SignUpPage = ({ isAuthenticated, user }) => {
       });
 
       if (signUpResponse.status === 201) {
-        const loginResponse = await axios.post('http://localhost:5001/login', { email, password: password1 });
+        const loginResponse = await axios.post("http://localhost:5001/login", {
+          email,
+          password: password1,
+        });
         const { access_token, user } = loginResponse.data;
 
-        localStorage.setItem('token', access_token);
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("user", JSON.stringify(user));
         setAuthData({ isAuthenticated: true, token: access_token, user: user });
 
-        setMessage({ type: 'success', content: 'Account created successfully! Logging you in...' });
-        setTimeout(() => navigate('/home'), 2000);
+        setMessage({
+          type: "success",
+          content: "Account created successfully! Logging you in...",
+        });
+        setTimeout(() => navigate("/home"), 2000);
       }
     } catch (error) {
-      const errorMessage = error.response && error.response.data ? error.response.data.error : 'An error occurred. Please try again.';
-      setMessage({ type: 'error', content: errorMessage });
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.error
+          : "An error occurred. Please try again.";
+      setMessage({ type: "error", content: errorMessage });
     }
   };
 
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
       <div align="center">
-        <img src="/kitty2.jpg" style={{ width: '200px', height: 'auto' }} alt="Avatar" className="avatar" />
+        <img
+          src="/kitty2.jpg"
+          style={{ width: "200px", height: "auto" }}
+          alt="Avatar"
+          className="avatar"
+        />
       </div>
       <div>
-        <h5 align="center" style={{ color: 'rgb(43, 57, 55)' }}>
+        <h5 align="center" style={{ color: "rgb(43, 57, 55)" }}>
           Join our Flame Picks family!
         </h5>
         {message.content && (
-          <div className={`alert ${message.type === 'error' ? 'alert-danger' : 'alert-success'}`} role="alert">
+          <div
+            className={`alert ${
+              message.type === "error" ? "alert-danger" : "alert-success"
+            }`}
+            role="alert"
+          >
             {message.content}
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <h3 align="center" style={{ color: 'rgb(30, 139, 121)' }}>Sign Up</h3>
+          <h3 align="center" style={{ color: "rgb(30, 139, 121)" }}>
+            Sign Up
+          </h3>
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
             <input
@@ -137,7 +161,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
             />
           </div>
           <br />
-          <button type="submit" className="btn btn-info">
+          <button type="submit" className="btn custom-btn-green">
             <i className="fa fa-fw fa-user"></i>Create Account
           </button>
         </form>

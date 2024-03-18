@@ -33,21 +33,11 @@ const Accordion = ({ title, children }) => {
 
 const SettingsPage = ({ children }) => {
   const { isDarkMode, setIsDarkMode } = useAuth();
-  // const { isDarkMode, setIsDarkMode } = useContext(AuthProvider);
-  /*useEffect(() => {
-        document.body.classList.add("settings-page-bg");
-
-        return () => {
-            document.body.classList.remove("settings-page-bg");
-        };
-      }, []);*/
 
   useEffect(() => {
-    document.body.style.backgroundColor = isDarkMode ? "grey" : "white";
-
-    // return () => {
-    //   document.body.style.backgroundColor = "";
-    // };
+    document.body.style.backgroundColor = isDarkMode
+      ? "rgb(29, 37, 31)"
+      : "rgb(204, 248, 229)";
   }, [isDarkMode]);
 
   const toggleDarkMode = () => {
@@ -56,85 +46,76 @@ const SettingsPage = ({ children }) => {
 
   return (
     <BaseLayout>
-      <div
-        className="fullPageDiv"
+      <h1
+        align="center"
         style={{
-          minHeight: "100vh",
-          padding: "20px",
+          color: isDarkMode ? "white" : "#631d1d",
           fontFamily: "'Times New Roman', Times, serif",
-          color: "#000000d0",
+          padding: "7px",
         }}
       >
-        <h1 align="center" style={{ color: isDarkMode ? "white" : "#631d1d" }}>
-          Settings Page
-        </h1>
-        <ol
-          style={{
-            color: "#000000d0",
-            fontFamily: "'Times New Roman', Times, serif",
-            fontSize: "150%",
-          }}
-        >
-          <Accordion title="General Settings">
-            <ul>
-              <li>Site title and tagline</li>
-              <li>Site URL</li>
-              <li>Timezone settings</li>
-              <li>Date and time format</li>
-              <li>
-                <a href="https://www.freepik.com/free-vector/cute-cat-cartoon-character_45188752.htm#page=2&query=cat%20clipart&position=3&from_view=search&track=ais&uuid=234b2f64-1ae7-42ff-b5a9-f3a54eb7e393">
-                  Image by brgfx
-                </a>{" "}
-                on Freepik
-              </li>
-              <li>
-                <a href="https://www.freepik.com/free-vector/cute-black-kitten-sitting-pose_43941387.htm#page=2&query=cat&position=4&from_view=author&uuid=e2b6486b-a4a3-41b4-aa88-8ad098501516">
-                  Image by brgfx
-                </a>{" "}
-                on Freepik
-              </li>
-            </ul>
-          </Accordion>
-          <Accordion title="Account Settings">
-            <ul>
-              <li>Logo and site icon</li>
-              <li>Favicon</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Theme Settings">
-            <ul>
-              <li>
-                <label className="toggle">
-                  <input
-                    type="checkbox"
-                    checked={isDarkMode}
-                    onChange={toggleDarkMode}
-                  />
-                  <span className="slider"></span>
-                </label>
-              </li>
-            </ul>
-          </Accordion>
-          <Accordion title="Timezone Settings">
-            <ul>
-              <li>
-                Comment settings (enable/disable comments, moderation settings)
-              </li>
-              <li>Avatar display settings</li>
-              <li>Comment form settings</li>
-            </ul>
-          </Accordion>
-          <Accordion title="Password Settings">
-            <ul>
-              <li>
-                Comment settings (enable/disable comments, moderation settings)
-              </li>
-              <li>Avatar display settings</li>
-              <li>Comment form settings</li>
-            </ul>
-          </Accordion>
-        </ol>
-      </div>
+        Settings Page
+      </h1>
+      <ol
+        style={{
+          color: "#000000d0",
+          fontFamily: "'Times New Roman', Times, serif",
+          fontSize: "150%",
+        }}
+      >
+        <Accordion title="Account Settings">
+          <ul>
+            <li>first name change</li>
+            <li>last name change</li>
+            <li>email change</li>
+            <li>apply button</li>
+          </ul>
+        </Accordion>
+        <Accordion title="Theme Settings">
+          <ul>
+            <li>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={isDarkMode}
+                  onChange={toggleDarkMode}
+                />
+                <span className="slider"></span>
+              </label>
+            </li>
+          </ul>
+        </Accordion>
+        <Accordion title="Timezone Settings">
+          <ul>
+            <li>timezone dropbox</li>
+            <li>apply button</li>
+          </ul>
+        </Accordion>
+        <Accordion title="Password Settings">
+          <ul>
+            <li>password authentification</li>
+            <li>asks for password 1</li>
+            <li>asks for password 2</li>
+            <li>apply button</li>
+          </ul>
+        </Accordion>
+        <Accordion title="Pictures Links">
+          <ul>
+            <li>
+              <a href="https://www.freepik.com/free-vector/cute-cat-cartoon-character_45188752.htm#page=2&query=cat%20clipart&position=3&from_view=search&track=ais&uuid=234b2f64-1ae7-42ff-b5a9-f3a54eb7e393">
+                Image by brgfx
+              </a>{" "}
+              on Freepik
+            </li>
+            <li>
+              <a href="https://www.freepik.com/free-vector/cute-black-kitten-sitting-pose_43941387.htm#page=2&query=cat&position=4&from_view=author&uuid=e2b6486b-a4a3-41b4-aa88-8ad098501516">
+                Image by brgfx
+              </a>{" "}
+              on Freepik
+            </li>
+          </ul>
+        </Accordion>
+      </ol>
     </BaseLayout>
   );
 };

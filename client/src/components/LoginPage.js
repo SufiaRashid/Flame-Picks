@@ -1,49 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import BaseLayout from './BaseLayout';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import BaseLayout from "./BaseLayout";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState({ type: '', content: '' });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState({ type: "", content: "" });
   const navigate = useNavigate();
   const { setAuthData } = useAuth();
 
   useEffect(() => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setAuthData({ isAuthenticated: false, token: null });
-    console.log('Authentication state cleared');
+    console.log("Authentication state cleared");
   }, [setAuthData]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage({ type: '', content: '' });
+    setMessage({ type: "", content: "" });
 
     if (password.length < 8) {
-      setMessage({ type: 'error', content: 'Password must be at least 8 characters long.' });
+      setMessage({
+        type: "error",
+        content: "Password must be at least 8 characters long.",
+      });
       return;
     }
 
     try {
-      const response = await axios.post('http://localhost:5001/login', { email, password });
+      const response = await axios.post("http://localhost:5001/login", {
+        email,
+        password,
+      });
       const { access_token, user } = response.data;
 
-      setMessage({ type: 'success', content: 'Login successful! Redirecting...' });
+      setMessage({
+        type: "success",
+        content: "Login successful! Redirecting...",
+      });
 
       setTimeout(() => {
-        localStorage.setItem('token', access_token);
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("user", JSON.stringify(user));
         setAuthData({ isAuthenticated: true, token: access_token, user: user });
-  
-        navigate('/home');
+
+        navigate("/home");
       }, 1500);
     } catch (error) {
       if (error.response) {
-        setMessage({ type: 'error', content: error.response.data.error });
+        setMessage({ type: "error", content: error.response.data.error });
       } else {
-        setMessage({ type: 'error', content: 'An error occurred. Please try again.' });
+        setMessage({
+          type: "error",
+          content: "An error occurred. Please try again.",
+        });
       }
     }
   };
@@ -51,19 +63,31 @@ const LoginPage = () => {
   return (
     <BaseLayout>
       <div align="center">
-        <img src="/kitty.jpg" style={{ width: '200px', height: 'auto' }} alt="Avatar" className="avatar" />
+        <img
+          src="/kitty.jpg"
+          style={{ width: "200px", height: "auto" }}
+          alt="Avatar"
+          className="avatar"
+        />
       </div>
       <div>
-        <h5 align="center" style={{ color: 'rgb(43, 57, 55)' }}>
+        <h5 align="center" style={{ color: "rgb(43, 57, 55)" }}>
           Welcome returning sports lovers!
         </h5>
         {message.content && (
-          <div className={`alert ${message.type === 'error' ? 'alert-danger' : 'alert-success'}`} role="alert">
+          <div
+            className={`alert ${
+              message.type === "error" ? "alert-danger" : "alert-success"
+            }`}
+            role="alert"
+          >
             {message.content}
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <h3 align="center" style={{ color: 'rgb(30, 139, 121)' }}>Login</h3>
+          <h3 align="center" style={{ color: "rgb(30, 139, 121)" }}>
+            Login
+          </h3>
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
             <input
@@ -89,7 +113,7 @@ const LoginPage = () => {
             />
           </div>
           <br />
-          <button type="submit" className="btn btn-info">
+          <button type="submit" className="btn custom-btn-green">
             <i className="fa fa-fw fa-sign-in"></i>Login
           </button>
         </form>

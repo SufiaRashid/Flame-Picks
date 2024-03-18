@@ -64,7 +64,7 @@ body.leaderboard-page-bg {
 
 .panel {
   padding: 0 18px;
-  background-color: rgb(228, 246, 243);
+  background-color: rgb(228, 246, 243, 0.7);
   border-radius: 10px;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
@@ -106,7 +106,6 @@ body.leaderboard-page-bg {
 }
 
 .fullPageDiv {
-  background-color: rgb(204, 248, 229);
   position: absolute;
   top: 10;
   left: 0;
@@ -137,6 +136,7 @@ body.leaderboard-page-bg {
   right: 0;
   bottom: 0;
   background-color: #ffc4b3;
+  border: 1px solid rgb(208, 89, 89);
   transition: 0.4s;
   border-radius: 34px;
 }
@@ -148,15 +148,21 @@ body.leaderboard-page-bg {
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: rgb(226, 209, 209);
+  background-color: rgb(255, 235, 235);
   transition: 0.4s;
   border-radius: 50%;
 }
 
 input:checked + .slider {
-  background-color: #35231e;
+  background-color: #3b2823;
 }
 
 input:checked + .slider:before {
   transform: translateX(26px);
+}
+
+.custom-btn-green {
+  background-color: rgb(10, 75, 39);
+  color: white; /* Optionally, change text color to white */
+  /* Add any additional styling as needed */
 }
