@@ -65,7 +65,7 @@ const SettingsPage = ({ children }) => {
           color: "#000000d0",
         }}
       >
-        <h1 align="center" style={{ color: isDarkMode ? "white" : "black" }}>
+        <h1 align="center" style={{ color: isDarkMode ? "white" : "#631d1d" }}>
           Settings Page
         </h1>
         <ol
@@ -77,17 +77,6 @@ const SettingsPage = ({ children }) => {
         >
           <Accordion title="General Settings">
             <ul>
-              <li>
-                <label>
-                  Dark mode
-                  <input
-                    type="checkbox"
-                    checked={isDarkMode}
-                    onChange={toggleDarkMode}
-                  />
-                  <span></span>
-                </label>
-              </li>
               <li>Site title and tagline</li>
               <li>Site URL</li>
               <li>Timezone settings</li>
@@ -114,11 +103,28 @@ const SettingsPage = ({ children }) => {
           </Accordion>
           <Accordion title="Theme Settings">
             <ul>
-              <li>Default post category and format</li>
-              <li>Default post editor</li>
+              <li>
+                <label className="toggle">
+                  <input
+                    type="checkbox"
+                    checked={isDarkMode}
+                    onChange={toggleDarkMode}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </li>
             </ul>
           </Accordion>
-          <Accordion title="Discussion Settings">
+          <Accordion title="Timezone Settings">
+            <ul>
+              <li>
+                Comment settings (enable/disable comments, moderation settings)
+              </li>
+              <li>Avatar display settings</li>
+              <li>Comment form settings</li>
+            </ul>
+          </Accordion>
+          <Accordion title="Password Settings">
             <ul>
               <li>
                 Comment settings (enable/disable comments, moderation settings)
