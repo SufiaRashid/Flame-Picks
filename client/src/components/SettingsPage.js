@@ -58,7 +58,6 @@ const SettingsPage = ({ children }) => {
     <BaseLayout>
       <div
         style={{
-          backgroundColor: "hsl(180, 15%, 54%)",
           minHeight: "100vh",
           padding: "20px",
         }}

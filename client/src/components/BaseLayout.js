@@ -92,9 +92,7 @@ const BaseLayout = ({ children }) => {
           </div>
         </div>
       </nav>
-      <div style={{ backgroundColor: "rgb(120, 155, 155)" }}>
-        <div className="container">{children}</div>
-      </div>
+      <div className="container">{children}</div>
     </>
   );
 };
