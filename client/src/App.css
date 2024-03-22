@@ -14,6 +14,144 @@ body.leaderboard-page-bg {
   background-color: #90d4a5;
 }
 
+/* Additional styles for the leaderboard page */
+
+.leaderboard-container {
+  padding: 1rem; /* padding around the entire leaderboard container */
+}
+
+.leaderboard-table {
+  margin: 0 auto; /* center the table on the page */
+  width: 80%; /* set the width of the table to 80% of its container */
+  border-collapse: separate; /* needed for border-radius to work */
+  border-spacing: 0; /* elim the space between cells */
+  border-radius: 8px; /* rounded corners for the outer edge of the table */
+  overflow: hidden; /* so the content does not spill outside the border-radius */
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 0.5rem; /* padding inside table cells */
+  border: 1px solid #ddd; /* border to each cell */
+}
+
+/* Round the top corners of the first and last th */
+.leaderboard-table th:first-child {
+  border-top-left-radius: 8px; /* round the top-left corner */
+}
+
+.leaderboard-table th:last-child {
+  border-top-right-radius: 8px; /* round the top-right corner */
+}
+
+/* Round the bottom corners of the first and last td in the last row */
+.leaderboard-table tr:last-child td:first-child {
+  border-bottom-left-radius: 8px; /* round the bottom-left corner */
+}
+
+.leaderboard-table tr:last-child td:last-child {
+  border-bottom-right-radius: 8px; /* round the bottom-right corner */
+}
+
+.leaderboard-table th {
+  background-color: #333; /* dark background for header */
+  color: #fff; /* light text for header */
+}
+
+.leaderboard-table tr:nth-child(even) {
+  background-color: #f2f2f2; /* zebra striping for rows */
+}
+
+.leaderboard-table tr:hover {
+  background-color: #ddd; /* highlight on hover */
+}
+
+.leaderboard-header {
+  font-size: 1.5em; /* font-size to be larger than the default */
+  font-weight: bold; /* bold */
+  color: #000; /* color to black */
+  text-align: left; 
+  margin-left: 1rem; /* add space on the left */
+  padding-bottom: 0.5rem; /* add space below the header */
+}
+
+/* Support Page css */
+
+.support-container {
+  max-width: 1200px; /* adjusted width to accommodate two columns */
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex; 
+  flex-wrap: wrap; 
+  justify-content: space-between; 
+}
+
+.support-header {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: left;
+  width: 100%; /* header spans the full width */
+}
+
+.support-content {
+  display: flex;
+  width: 100%; /* contents span the full width */
+  justify-content: space-between; /* distribute space between columns */
+}
+
+.support-column {
+  width: 48%; /* almost half of the container for each column */
+  display: flex; /* flex layout for internal alignment */
+  flex-direction: column; /* stack elements vertically */
+}
+
+/* styles for search and form elements */
+.search-container {
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-input,
+.form-textarea {
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.form-textarea {
+  height: 100px;
+}
+
+.submit-button {
+  padding: 0.5rem;
+  background-color: lightgreen;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* add styles specific to the FAQ section here */
+.faq-section {
+  /* FAQ section */
+}
+
 .support-page-bg {
   background-color: #8f7bc2;
 }
