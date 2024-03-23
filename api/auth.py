@@ -67,16 +67,25 @@ def get_events():
 
         for row in rows:
             event_data = row.find_all('td')
-            if event_data and len(event_data) > 2:
-                href = event_data[1].find('a', href=True)['href'] if event_data[1].find('a', href=True) else None
-                if href:
+            if event_data and len(event_data) > 3:
+                href_element = event_data[1].find('a', href=True)
+                if href_element:
+                    href = href_element['href']
                     teams = href.split('/')[-1].split('-vs-')
                     home_team = teams[0].rsplit('-', 1)[-1]
                     away_team = teams[1].rsplit('-', 1)[-1]
 
                     date = event_data[0].get_text(strip=True)
+                    score = event_data[2].get_text(strip=True)
+                    time = event_data[5].get_text(strip=True)
 
-                    events.append({'home_team': home_team, 'away_team': away_team, 'date': date})
+                    events.append({
+                        'home_team': home_team, 
+                        'away_team': away_team, 
+                        'date': date, 
+                        'score': score,
+                        'time': time
+                    })
 
         return jsonify(events)
 

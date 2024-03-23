@@ -109,9 +109,30 @@ const HomePage = ({ isAuthenticated, user }) => {
       try {
         const response = await axios.get('http://localhost:5001/get-events');
         if (Array.isArray(response.data)) {
+          const adjustDateForEasternTime = (date, time) => {
+            if (!time) return date;
+          
+            const dateParts = date.split('/').map(Number);
+            const timeParts = time.match(/(\d+):(\d+)(am|pm)/);
+          
+            if (!timeParts) return date;
+          
+            let hour = Number(timeParts[1]);
+          
+            if (timeParts[3] === 'pm' && hour !== 12) hour += 12;
+            if (timeParts[3] === 'am' && hour === 12) hour = 0;
+          
+            const gameDate = new Date(Date.UTC(2022, dateParts[1] - 1, dateParts[0], hour));
+          
+            gameDate.setHours(gameDate.getHours() - 4);
+          
+            return `${gameDate.getDate()}/${gameDate.getMonth() + 1}`;
+          };
+
           const groupedEvents = response.data.reduce((acc, event) => {
-            acc[event.date] = acc[event.date] || [];
-            acc[event.date].push(event);
+            const adjustedDate = adjustDateForEasternTime(event.date, event.time);
+            acc[adjustedDate] = acc[adjustedDate] || [];
+            acc[adjustedDate].push(event);
             return acc;
           }, {});
 
@@ -131,16 +152,33 @@ const HomePage = ({ isAuthenticated, user }) => {
     // Implement this soon
   };
 
+  const formatDate = (dateString) => {
+    const months = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"];
+    const [day, month] = dateString.split('/').map(Number);
+    return `${months[month - 1]} ${day}`;
+  };
+
+  const sortDates = (dates) => {
+    return dates.sort((a, b) => {
+      const [dayA, monthA] = a.split('/');
+      const [dayB, monthB] = b.split('/');
+      const dateA = new Date(`2022-${monthA}-${dayA}`);
+      const dateB = new Date(`2022-${monthB}-${dayB}`);
+      return dateA - dateB;
+    });
+  };
+
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
       <h5 align="center" style={{ color: 'rgb(43, 57, 55)', marginBottom: '40px' }}>
         Gameweek - Make Your Picks!
       </h5>
       {Object.keys(eventsByDate).length > 0 ? (
-        Object.entries(eventsByDate).map(([date, events], index) => (
+        sortDates(Object.keys(eventsByDate)).map((date, index) => (
           <div key={index}>
-            <h3 style={{ textAlign: 'center', marginTop: '20px' }}>{date}</h3>
-            {events.map((event, eventIndex) => (
+            <h3 style={{ textAlign: 'center', marginTop: '20px' }}>{formatDate(date)}</h3>
+            {eventsByDate[date].map((event, eventIndex) => (
               <MatchPick
                 key={eventIndex}
                 homeTeam={event.home_team.toUpperCase()}
