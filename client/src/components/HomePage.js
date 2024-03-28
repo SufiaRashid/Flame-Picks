@@ -9,6 +9,7 @@ const rowStyle = {
   marginBottom: '20px',
 };
 
+
 const buttonStyle = {
   margin: '0 10px',
   padding: '40px 5px',
@@ -101,8 +102,25 @@ const makePicksButtonStyle = {
   transition: 'background-color 0.3s',
 };
 
+//will implement later
+const skipButtonStyle = {
+  padding: '10px 20px',
+  fontSize: '0.8rem',
+  fontWeight: 'bold',
+  cursor: 'pointer',
+  border: '1px solid #ccc',
+  borderRadius: '5px',
+  backgroundColor: '#ffffff',
+  color: '#000000',
+  marginLeft: '10px',
+  outline: 'none',
+  transition: 'opacity 0.3s',
+};
+
 const HomePage = ({ isAuthenticated, user }) => {
   const [eventsByDate, setEventsByDate] = useState({});
+  const [visibleDates, setVisibleDates] = useState({});
+  const [dismissedDates, setDismissedDates] = useState({});
 
   useEffect(() => {
     const fetchAndGroupEventsByDate = async () => {
@@ -155,6 +173,7 @@ const HomePage = ({ isAuthenticated, user }) => {
             }, {});
 
           setEventsByDate(filteredAndGroupedEvents);
+          setVisibleDates(filteredAndGroupedEvents);
         } else {
           console.error('Event data is not in the expected array format:', response.data);
         }
@@ -166,9 +185,26 @@ const HomePage = ({ isAuthenticated, user }) => {
     fetchAndGroupEventsByDate();
   }, []);
 
-  const handleMakePicks = () => {
-    // Implement this soon
+  const handleMakePicksForDate = (date) => {
+    console.log('Picks submitted for date:', date);
   };
+
+  const handleDismissDate = (date) => {
+    setDismissedDates(prev => ({ ...prev, [date]: 'fading' }));
+  
+    setTimeout(() => {
+      setDismissedDates(prev => ({ ...prev, [date]: 'collapsed' }));
+  
+      setTimeout(() => {
+        setVisibleDates(prevDates => {
+          const newDates = { ...prevDates };
+          delete newDates[date];
+          return newDates;
+        });
+      }, 300);
+    }, 300);
+  };
+
 
   const formatDate = (dateString) => {
     const months = ["January", "February", "March", "April", "May", "June",
@@ -189,12 +225,19 @@ const HomePage = ({ isAuthenticated, user }) => {
 
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
-      <h5 align="center" style={{ color: 'rgb(43, 57, 55)', marginBottom: '40px' }}>
-        Gameweek - Make Your Picks!
+      <h5 align="center" style={{ color: 'rgb(43, 57, 55)', marginBottom: '40px', fontSize: '2.5rem' }}>
+        This Week's NBA Picks
       </h5>
       {Object.keys(eventsByDate).length > 0 ? (
         sortDates(Object.keys(eventsByDate)).map((date, index) => (
-          <div key={index}>
+          <div key={index}
+          style={{
+            transition: 'opacity 0.3s, height 0.3s',
+            opacity: dismissedDates[date] === 'fading' ? 0 : 1,
+            height: dismissedDates[date] === 'collapsed' ? 0 : 'auto',
+            overflow: 'hidden',
+          }}
+          >
             <h3 style={{ textAlign: 'center', marginTop: '20px' }}>{formatDate(date)}</h3>
             {eventsByDate[date].map((event, eventIndex) => (
               <MatchPick
@@ -203,14 +246,19 @@ const HomePage = ({ isAuthenticated, user }) => {
                 awayTeam={event.away_team.toUpperCase()}
               />
             ))}
-          </div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+            <button
+                style={makePicksButtonStyle}
+                onClick={() => handleDismissDate(date)}
+            >
+            Make Picks
+            </button>
+            </div>
+            </div>
         ))
       ) : (
         <p>Loading event details...</p>
       )}
-      <button style={makePicksButtonStyle} onClick={handleMakePicks}>
-        Make Picks
-      </button>
     </BaseLayout>
   );
 };
