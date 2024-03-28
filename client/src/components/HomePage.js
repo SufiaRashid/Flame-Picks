@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BaseLayout from './BaseLayout';
 import axios from 'axios';
+import { useAuth } from "../context/AuthContext";
 
 const rowStyle = {
   display: 'flex',
@@ -123,71 +124,75 @@ const skipButtonStyle = {
 };
 
 const HomePage = ({ isAuthenticated, user }) => {
+  const { authData} = useAuth();
   const [eventsByDate, setEventsByDate] = useState({});
   const [visibleDates, setVisibleDates] = useState({});
   const [dismissedDates, setDismissedDates] = useState({});
   const [picks, setPicks] = useState({});
+  const [loading, setLoading] = useState(true);
+
+
 
   useEffect(() => {
     const fetchAndGroupEventsByDate = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/get-events');
-        if (Array.isArray(response.data)) {
-          const adjustDateForEasternTime = (date, time) => {
-            if (!time) return date;
-          
-            const dateParts = date.split('/').map(Number);
-            const timeParts = time.match(/(\d+):(\d+)(am|pm)/);
-          
-            if (!timeParts) return date;
-          
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error('No authentication token found');
+          return;
+        }
+  
+        const eventsPromise = axios.get('http://localhost:5001/get-events');
+        const picksPromise = axios.get('http://localhost:5001/get-picks', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        console.log("waiting...")
+  
+        const [eventsResponse, picksResponse] = await Promise.all([eventsPromise, picksPromise]);
+        console.log('done')
+  
+        const events = eventsResponse.data;
+        const userPicks = new Set(picksResponse.data.map(pick => pick.game_id));
+  
+        const currentDate = new Date();
+        currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset());
+  
+        const filteredAndGroupedEvents = events
+          .filter(event => !userPicks.has(event.game_id))
+          .filter(event => {
+            const [day, month] = event.date.split('/').map(Number);
+            const hours = event.time.includes('pm') ? parseInt(event.time) + 12 : parseInt(event.time);
+            const gameDate = new Date(Date.UTC(currentDate.getFullYear(), month - 1, day, hours));
+            return gameDate >= currentDate;
+          })
+          .reduce((acc, event) => {
+            const dateParts = event.date.split('/').map(Number);
+            const timeParts = event.time.match(/(\d+):(\d+)(am|pm)/);
             let hour = Number(timeParts[1]);
-          
             if (timeParts[3] === 'pm' && hour !== 12) hour += 12;
             if (timeParts[3] === 'am' && hour === 12) hour = 0;
-          
-            const gameDate = new Date(Date.UTC(2022, dateParts[1] - 1, dateParts[0], hour));
+            const gameDate = new Date(Date.UTC(currentDate.getFullYear(), dateParts[1] - 1, dateParts[0], hour));
             gameDate.setHours(gameDate.getHours() - 4);
-          
-            const adjustedMonth = (gameDate.getMonth() + 1).toString().padStart(2, '0');
-            const adjustedDay = gameDate.getDate().toString().padStart(2, '0');
-
-            return `${adjustedDay}/${adjustedMonth}`;
-          };
-          
-
-          const currentDate = new Date();
-          currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset());
-          
-          const isAfterCurrentDate = (date, time) => {
-            const [day, month] = date.split('/').map(Number);
-            const [hours, minutes] = time.endsWith('pm') ?
-              [12 + parseInt(time), 0] :
-              time.split(':').map((t, i) => i === 0 ? parseInt(t) % 12 : parseInt(t));
-            
-            const gameDate = new Date(Date.UTC(currentDate.getFullYear(), month - 1, day, hours, minutes));
-            return gameDate > currentDate;
-          };
-
-          const filteredAndGroupedEvents = response.data
-            .filter(event => isAfterCurrentDate(event.date, event.time))
-            .reduce((acc, event) => {
-              const adjustedDate = adjustDateForEasternTime(event.date, event.time);
-              acc[adjustedDate] = acc[adjustedDate] || [];
-              acc[adjustedDate].push(event);
-              return acc;
-            }, {});
-
-          setEventsByDate(filteredAndGroupedEvents);
-          setVisibleDates(filteredAndGroupedEvents);
-        } else {
-          console.error('Event data is not in the expected array format:', response.data);
-        }
+            const adjustedDate = `${gameDate.getDate().toString().padStart(2, '0')}/${(gameDate.getMonth() + 1).toString().padStart(2, '0')}`;
+  
+            acc[adjustedDate] = acc[adjustedDate] || [];
+            acc[adjustedDate].push({
+              ...event,
+              adjustedDate
+            });
+            return acc;
+          }, {});
+  
+        setEventsByDate(filteredAndGroupedEvents);
+        setVisibleDates(filteredAndGroupedEvents);
       } catch (error) {
-        console.error('Error fetching event details:', error);
+        console.error('Error fetching events or user picks:', error);
       }
+      setLoading(false);
     };
-
+  
     fetchAndGroupEventsByDate();
   }, []);
 
@@ -264,7 +269,9 @@ const HomePage = ({ isAuthenticated, user }) => {
       <h5 align="center" style={{ color: 'rgb(43, 57, 55)', marginBottom: '40px', fontSize: '2.5rem' }}>
         This Week's NBA Picks
       </h5>
-      {Object.keys(eventsByDate).length > 0 ? (
+      {loading ? (
+        <p>Loading event details...</p>
+      ) : Object.keys(eventsByDate).length > 0 ? (
         sortDates(Object.keys(eventsByDate)).map((date, index) => (
           <div key={index}
           style={{
@@ -284,7 +291,7 @@ const HomePage = ({ isAuthenticated, user }) => {
                 onPickSelected={(team, gameid) => {
                   setPicks(currentPicks => ({
                     ...currentPicks,
-                    [date]: [...(currentPicks[date] || []), { gameid, team }] 
+                    [date]: [...(currentPicks[date] || []), { gameid, team }]
                   }));
                 }}
               />
@@ -300,7 +307,10 @@ const HomePage = ({ isAuthenticated, user }) => {
             </div>
         ))
       ) : (
-        <p>Loading event details...</p>
+        <div align="center">
+          <img src={`/HomePage/ballincat.jpg`} alt="All Picks Made" style={{ width: '200px', height: 'auto' }} />
+          <p style={{ fontSize: '1.5rem' }}>Sorry, {authData.user?.firstName}. You have already made all NBA picks for this week.</p>
+        </div>
       )}
     </BaseLayout>
   );
