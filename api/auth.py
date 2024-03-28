@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
-from .models import User
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from .models import User, GamePick
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
@@ -49,6 +49,57 @@ def sign_up():
 
     return jsonify({'message': 'Account created successfully!'}), 201
 
+@auth.route('/make-pick', methods=['POST'])
+@jwt_required()
+def make_pick():
+    current_user_email = get_jwt_identity()
+    user = User.query.filter_by(email=current_user_email).first()
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    picks_data = request.get_json()
+    
+    if not isinstance(picks_data, list):
+        return jsonify({'error': 'Invalid data format. Expecting a list of picks.'}), 400
+
+    response_messages = []
+    for pick_data in picks_data:
+        game_id = pick_data.get('game_id')
+        picked_team = pick_data.get('picked_team')
+
+        existing_pick = GamePick.query.filter_by(user_id=user.id, game_id=game_id).first()
+        if existing_pick:
+            response_messages.append({'game_id': game_id, 'message': 'Pick already made'})
+            continue
+
+        new_pick = GamePick(user_id=user.id, game_id=game_id, picked_team=picked_team)
+        db.session.add(new_pick)
+        db.session.commit()
+        response_messages.append({'game_id': game_id, 'message': 'Pick saved'})
+
+    return jsonify(response_messages), 201
+
+@auth.route('/get-picks', methods=['GET'])
+@jwt_required()
+def get_picks():
+    current_user_email = get_jwt_identity()
+    user = User.query.filter_by(email=current_user_email).first()
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    user_picks = GamePick.query.filter_by(user_id=user.id).all()
+
+    picks_list = [
+        {
+            'game_id': pick.game_id,
+            'picked_team': pick.picked_team,
+        } for pick in user_picks
+    ]
+
+    return jsonify(picks_list), 200
+
 
 @auth.route('/get-events', methods=['GET'])
 def get_events():
@@ -72,6 +123,7 @@ def get_events():
                 if href_element:
                     href = href_element['href']
                     teams = href.split('/')[-1].split('-vs-')
+                    game_id = teams[0].rsplit('-', 3)[0]
                     home_team = teams[0].rsplit('-', 1)[-1]
                     away_team = teams[1].rsplit('-', 1)[-1]
 
@@ -84,7 +136,8 @@ def get_events():
                         'away_team': away_team, 
                         'date': date, 
                         'score': score,
-                        'time': time
+                        'time': time,
+                        'game_id': game_id 
                     })
 
         return jsonify(events)

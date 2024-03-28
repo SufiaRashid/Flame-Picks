@@ -46,8 +46,13 @@ const selectedDrawButtonStyle = {
   color: '#ffffff',
 };
 
-const MatchPick = ({ homeTeam, awayTeam }) => {
+const MatchPick = ({ homeTeam, awayTeam, gameid, onPickSelected }) => {
   const [pick, setPick] = useState(null);
+
+  const handlePick = (team) => {
+    setPick(team);
+    onPickSelected(team, gameid);
+  };
 
   const versusStyle = {
     margin: '0 20px',
@@ -70,14 +75,14 @@ const MatchPick = ({ homeTeam, awayTeam }) => {
     <div style={rowStyle}>
       <img src={getTeamLogoPath(homeTeam)} alt={homeTeam} style={{ ...logoStyle, marginRight: '10px' }} />
       <button
-        onClick={() => setPick(homeTeam)}
+        onClick={() => handlePick(homeTeam)}
         style={pick === homeTeam ? selectedButtonStyle : buttonStyle}
       >
         {homeTeam}
       </button>
       <div style={versusStyle}>VS.</div>
       <button
-        onClick={() => setPick(awayTeam)}
+        onClick={() => handlePick(awayTeam)}
         style={pick === awayTeam ? selectedButtonStyle : buttonStyle}
       >
         {awayTeam}
@@ -121,6 +126,7 @@ const HomePage = ({ isAuthenticated, user }) => {
   const [eventsByDate, setEventsByDate] = useState({});
   const [visibleDates, setVisibleDates] = useState({});
   const [dismissedDates, setDismissedDates] = useState({});
+  const [picks, setPicks] = useState({});
 
   useEffect(() => {
     const fetchAndGroupEventsByDate = async () => {
@@ -185,8 +191,38 @@ const HomePage = ({ isAuthenticated, user }) => {
     fetchAndGroupEventsByDate();
   }, []);
 
-  const handleMakePicksForDate = (date) => {
-    console.log('Picks submitted for date:', date);
+  const handleMakePicksForDate = async (date) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error('No authentication token found');
+      return;
+    }
+
+    const datePicks = picks[date];
+    if (!datePicks) {
+      console.error('No picks to submit for this date:', date);
+      return;
+    }
+
+    console.log('Submitting picks for game IDs:', datePicks.map(pick => pick.gameid));
+
+    const postData = datePicks.map(pick => ({
+      game_id: pick.gameid,
+      picked_team: pick.team,
+    }));
+
+    try {
+      const response = await axios.post('http://localhost:5001/make-pick', postData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+    
+      console.log('Response from make pick:', response.data);
+    } catch (error) {
+      console.error('Error submitting picks:', error);
+    }
+    handleDismissDate(date);
   };
 
   const handleDismissDate = (date) => {
@@ -244,12 +280,19 @@ const HomePage = ({ isAuthenticated, user }) => {
                 key={eventIndex}
                 homeTeam={event.home_team.toUpperCase()}
                 awayTeam={event.away_team.toUpperCase()}
+                gameid={event.game_id}
+                onPickSelected={(team, gameid) => {
+                  setPicks(currentPicks => ({
+                    ...currentPicks,
+                    [date]: [...(currentPicks[date] || []), { gameid, team }] 
+                  }));
+                }}
               />
             ))}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
             <button
                 style={makePicksButtonStyle}
-                onClick={() => handleDismissDate(date)}
+                onClick={() => handleMakePicksForDate(date)}
             >
             Make Picks
             </button>
