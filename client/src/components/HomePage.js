@@ -123,20 +123,38 @@ const HomePage = ({ isAuthenticated, user }) => {
             if (timeParts[3] === 'am' && hour === 12) hour = 0;
           
             const gameDate = new Date(Date.UTC(2022, dateParts[1] - 1, dateParts[0], hour));
-          
             gameDate.setHours(gameDate.getHours() - 4);
           
-            return `${gameDate.getDate()}/${gameDate.getMonth() + 1}`;
+            const adjustedMonth = (gameDate.getMonth() + 1).toString().padStart(2, '0');
+            const adjustedDay = gameDate.getDate().toString().padStart(2, '0');
+
+            return `${adjustedDay}/${adjustedMonth}`;
+          };
+          
+
+          const currentDate = new Date();
+          currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset());
+          
+          const isAfterCurrentDate = (date, time) => {
+            const [day, month] = date.split('/').map(Number);
+            const [hours, minutes] = time.endsWith('pm') ?
+              [12 + parseInt(time), 0] :
+              time.split(':').map((t, i) => i === 0 ? parseInt(t) % 12 : parseInt(t));
+            
+            const gameDate = new Date(Date.UTC(currentDate.getFullYear(), month - 1, day, hours, minutes));
+            return gameDate > currentDate;
           };
 
-          const groupedEvents = response.data.reduce((acc, event) => {
-            const adjustedDate = adjustDateForEasternTime(event.date, event.time);
-            acc[adjustedDate] = acc[adjustedDate] || [];
-            acc[adjustedDate].push(event);
-            return acc;
-          }, {});
+          const filteredAndGroupedEvents = response.data
+            .filter(event => isAfterCurrentDate(event.date, event.time))
+            .reduce((acc, event) => {
+              const adjustedDate = adjustDateForEasternTime(event.date, event.time);
+              acc[adjustedDate] = acc[adjustedDate] || [];
+              acc[adjustedDate].push(event);
+              return acc;
+            }, {});
 
-          setEventsByDate(groupedEvents);
+          setEventsByDate(filteredAndGroupedEvents);
         } else {
           console.error('Event data is not in the expected array format:', response.data);
         }
