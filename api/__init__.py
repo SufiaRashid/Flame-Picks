@@ -5,6 +5,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
+
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
@@ -31,5 +32,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        from .scrape import update_scores
+        update_scores()
     
     return app

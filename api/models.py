@@ -16,6 +16,7 @@ class GamePick(db.Model):
     game_id = db.Column(db.String(150), nullable=False)
     picked_team = db.Column(db.String(150), nullable=False)
     pick_time = db.Column(db.DateTime, default=datetime.utcnow)
+    result = db.Column(db.Integer, nullable=True)
     
     __table_args__ = (db.UniqueConstraint('user_id', 'game_id', name='_user_game_uc'),)
 
@@ -26,4 +27,5 @@ class Game(db.Model):
     away_team = db.Column(db.String(150), nullable=False)
     date = db.Column(db.String(150), nullable=False)
     score = db.Column(db.String(150), nullable=True)
-    time = db.Column(db.String(150), nullable=True)
+    time = db.Column(db.String(150), default='1:00pm')
+    winning_team = db.Column(db.String(150), nullable=True)

@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from .models import Game
+from .models import Game, GamePick
 from . import db
 import requests
 from bs4 import BeautifulSoup
@@ -59,5 +59,55 @@ def get_events():
 
     else:
         return jsonify({'error': 'Failed to retrieve content'}), response.status_code
+    
+@scrape.route('/update-scores', methods=['GET'])
+def update_scores():
+
+    games_to_update = Game.query.filter(
+            (Game.winning_team == None)
+        ).all()
+    
+    for game in games_to_update:
+        print("Looking at game id:", game.game_id)
+        score_url = f'https://www.thesportsdb.com/event/{game.game_id}'
+        score_response = requests.get(score_url)
+        
+        if score_response.ok:
+            score_soup = BeautifulSoup(score_response.content, 'html.parser')
+            score_elements = score_soup.find_all('h2')
+            
+            if len(score_elements) >= 2:
+                try:
+                    score1 = score_elements[1].text.strip()
+                    score2 = score_elements[2].text.strip()
+                    game.score = f'{score1} - {score2}'
+                    
+                    if score1 > score2:
+                        game.winning_team = game.home_team
+                    elif score2 > score1:
+                        game.winning_team = game.away_team
+                    else:
+                        game.winning_team = None
+                    
+                    db.session.commit()
+
+                except ValueError:
+                    print(f"Error converting score text to integer for game {game.game_id}")
+                    continue
+            else:
+                print(f"Score not found for game {game.game_id}")
+
+        game_picks = GamePick.query.filter_by(result=None).all()
+        for pick in game_picks:
+            game = Game.query.filter_by(game_id=pick.game_id).first()
+            if game and game.winning_team:
+                pick.result = 1 if pick.picked_team == game.winning_team else 0
+                db.session.commit()
+            elif not game:
+                print(f"No game found with game_id {pick.game_id}")
+            else:
+                print(f"Game {game.game_id} does not have a winning team defined yet.")
+                
+    return jsonify({'message': 'Scores and winning teamsprint("Score 1:", score1) updated, GamePick results updated'}), 200
 
 
