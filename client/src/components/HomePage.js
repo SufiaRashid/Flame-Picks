@@ -131,8 +131,6 @@ const HomePage = ({ isAuthenticated, user }) => {
   const [picks, setPicks] = useState({});
   const [loading, setLoading] = useState(true);
 
-
-
   useEffect(() => {
     const fetchAndGroupEventsByDate = async () => {
       try {
@@ -142,8 +140,8 @@ const HomePage = ({ isAuthenticated, user }) => {
           return;
         }
   
-        const eventsPromise = axios.get('http://localhost:5001/get-events');
-        const picksPromise = axios.get('http://localhost:5001/get-picks', {
+        const eventsPromise = axios.get('http://localhost:5001/scrape/get-events');
+        const picksPromise = axios.get('http://localhost:5001/user/get-picks', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -159,8 +157,35 @@ const HomePage = ({ isAuthenticated, user }) => {
         const currentDate = new Date();
         currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset());
   
-        const filteredAndGroupedEvents = events
+        /*const filteredAndGroupedEvents = events
           .filter(event => !userPicks.has(event.game_id))
+          .filter(event => {
+            const [day, month] = event.date.split('/').map(Number);
+            const hours = event.time.includes('pm') ? parseInt(event.time) + 12 : parseInt(event.time);
+            const gameDate = new Date(Date.UTC(currentDate.getFullYear(), month - 1, day, hours));
+            return gameDate >= currentDate;
+          })
+          .reduce((acc, event) => {
+            const dateParts = event.date.split('/').map(Number);
+            const timeParts = event.time.match(/(\d+):(\d+)(am|pm)/);
+            let hour = Number(timeParts[1]);
+            if (timeParts[3] === 'pm' && hour !== 12) hour += 12;
+            if (timeParts[3] === 'am' && hour === 12) hour = 0;
+            const gameDate = new Date(Date.UTC(currentDate.getFullYear(), dateParts[1] - 1, dateParts[0], hour));
+            gameDate.setHours(gameDate.getHours() - 4);
+            const adjustedDate = `${gameDate.getDate().toString().padStart(2, '0')}/${(gameDate.getMonth() + 1).toString().padStart(2, '0')}`;
+  
+            acc[adjustedDate] = acc[adjustedDate] || [];
+            acc[adjustedDate].push({
+              ...event,
+              adjustedDate
+            });
+            return acc;
+          }, {});*/
+
+
+          //  I AM ALLOWING REPEAT PICKS FOR TESTING PURPOSE (I WILL REMOVE THIS LATER)
+          const filteredAndGroupedEvents = events
           .filter(event => {
             const [day, month] = event.date.split('/').map(Number);
             const hours = event.time.includes('pm') ? parseInt(event.time) + 12 : parseInt(event.time);
@@ -217,7 +242,7 @@ const HomePage = ({ isAuthenticated, user }) => {
     }));
 
     try {
-      const response = await axios.post('http://localhost:5001/make-pick', postData, {
+      const response = await axios.post('http://localhost:5001/user/make-pick', postData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -16,7 +16,9 @@ def create_app():
     db.init_app(app)
     CORS(app)
 
-    from .auth import auth #import auth
+    from .auth import auth
+    from .scrape import scrape
+    from .user import user
 
     from flask_jwt_extended import JWTManager
 
@@ -24,6 +26,8 @@ def create_app():
     JWTManager(app)
 
     app.register_blueprint(auth, url_prefix = '/')
+    app.register_blueprint(scrape, url_prefix = '/scrape')
+    app.register_blueprint(user, url_prefix = '/user')
 
     with app.app_context():
         db.create_all()
