@@ -157,7 +157,8 @@ const HomePage = ({ isAuthenticated, user }) => {
         const currentDate = new Date();
         currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset());
   
-        /*const filteredAndGroupedEvents = events
+        // TOGGLE WHEN TESTING
+        const filteredAndGroupedEvents = events
           .filter(event => !userPicks.has(event.game_id))
           .filter(event => {
             const [day, month] = event.date.split('/').map(Number);
@@ -181,10 +182,10 @@ const HomePage = ({ isAuthenticated, user }) => {
               adjustedDate
             });
             return acc;
-          }, {});*/
+          }, {});
 
 
-          //  I AM ALLOWING REPEAT PICKS FOR TESTING PURPOSE (I WILL REMOVE THIS LATER)
+          /*  TOGGLE WHEN TESTING
           const filteredAndGroupedEvents = events
           .filter(event => {
             const [day, month] = event.date.split('/').map(Number);
@@ -208,7 +209,7 @@ const HomePage = ({ isAuthenticated, user }) => {
               adjustedDate
             });
             return acc;
-          }, {});
+          }, {});*/
   
         setEventsByDate(filteredAndGroupedEvents);
         setVisibleDates(filteredAndGroupedEvents);

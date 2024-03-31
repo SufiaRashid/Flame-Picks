@@ -65,4 +65,6 @@ def get_score():
     if not user:
         return jsonify({'error': 'User not found'}), 404
     
-    return jsonify({'score': user.score}), 200
+    winning_picks_count = GamePick.query.filter_by(user_id=user.id, result=1).count()
+    
+    return jsonify({'score': winning_picks_count}), 200
