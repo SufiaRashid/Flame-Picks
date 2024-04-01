@@ -68,7 +68,6 @@ def update_scores():
         ).all()
     
     for game in games_to_update:
-        print("Looking at game id:", game.game_id)
         score_url = f'https://www.thesportsdb.com/event/{game.game_id}'
         score_response = requests.get(score_url)
         
@@ -103,10 +102,6 @@ def update_scores():
             if game and game.winning_team:
                 pick.result = 1 if pick.picked_team == game.winning_team else 0
                 db.session.commit()
-            elif not game:
-                print(f"No game found with game_id {pick.game_id}")
-            else:
-                print(f"Game {game.game_id} does not have a winning team defined yet.")
                 
     return jsonify({'message': 'Scores and winning teamsprint("Score 1:", score1) updated, GamePick results updated'}), 200
 

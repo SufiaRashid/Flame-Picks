@@ -68,3 +68,16 @@ def get_score():
     winning_picks_count = GamePick.query.filter_by(user_id=user.id, result=1).count()
     
     return jsonify({'score': winning_picks_count}), 200
+
+@user.route('/get-losses', methods=['GET'])
+@jwt_required()
+def get_losses():
+    current_user_email = get_jwt_identity()
+    user = User.query.filter_by(email=current_user_email).first()
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    losses_count = GamePick.query.filter_by(user_id=user.id, result=0).count()
+
+    return jsonify({'losses': losses_count}), 200

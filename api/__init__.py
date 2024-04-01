@@ -20,6 +20,7 @@ def create_app():
     from .auth import auth
     from .scrape import scrape
     from .user import user
+    from .data import data
 
     from flask_jwt_extended import JWTManager
 
@@ -29,6 +30,7 @@ def create_app():
     app.register_blueprint(auth, url_prefix = '/')
     app.register_blueprint(scrape, url_prefix = '/scrape')
     app.register_blueprint(user, url_prefix = '/user')
+    app.register_blueprint(data, url_prefix = '/data')
 
     with app.app_context():
         db.create_all()
