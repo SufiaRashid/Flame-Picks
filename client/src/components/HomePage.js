@@ -51,8 +51,8 @@ const MatchPick = ({ homeTeam, awayTeam, gameid, onPickSelected }) => {
   const [pick, setPick] = useState(null);
 
   const handlePick = (team) => {
-    setPick(team);
-    onPickSelected(team, gameid);
+    setPick(pick === team ? null : team);
+    onPickSelected(pick === team ? null : team, gameid);
   };
 
   const versusStyle = {
@@ -126,10 +126,11 @@ const skipButtonStyle = {
 const HomePage = ({ isAuthenticated, user }) => {
   const { authData} = useAuth();
   const [eventsByDate, setEventsByDate] = useState({});
-  const [visibleDates, setVisibleDates] = useState({});
-  const [dismissedDates, setDismissedDates] = useState({});
+  const [gameVisibility, setGameVisibility] = useState({});
   const [picks, setPicks] = useState({});
   const [loading, setLoading] = useState(true);
+  const [submittingStatus, setSubmittingStatus] = useState({});
+
 
   useEffect(() => {
     const fetchAndGroupEventsByDate = async () => {
@@ -212,7 +213,17 @@ const HomePage = ({ isAuthenticated, user }) => {
           }, {});*/
   
         setEventsByDate(filteredAndGroupedEvents);
-        setVisibleDates(filteredAndGroupedEvents);
+
+        const initialGameVisibility = Object.keys(filteredAndGroupedEvents).reduce((acc, date) => {
+          acc[date] = filteredAndGroupedEvents[date].reduce((acc, game) => {
+            acc[game.game_id] = true;
+            return acc;
+          }, {});
+          return acc;
+        }, {});
+    
+        setGameVisibility(initialGameVisibility);
+        
       } catch (error) {
         console.error('Error fetching events or user picks:', error);
       }
@@ -220,28 +231,32 @@ const HomePage = ({ isAuthenticated, user }) => {
     };
   
     fetchAndGroupEventsByDate();
+
   }, []);
 
   const handleMakePicksForDate = async (date) => {
+    setSubmittingStatus(prev => ({ ...prev, [date]: true }));
     const token = localStorage.getItem("token");
     if (!token) {
       console.error('No authentication token found');
+      setSubmittingStatus(prev => ({ ...prev, [date]: false }));
       return;
     }
-
+  
     const datePicks = picks[date];
-    if (!datePicks) {
+    if (!datePicks || datePicks.length === 0) {
       console.error('No picks to submit for this date:', date);
+      setSubmittingStatus(prev => ({ ...prev, [date]: false }));
       return;
     }
-
+  
     console.log('Submitting picks for game IDs:', datePicks.map(pick => pick.gameid));
-
+  
     const postData = datePicks.map(pick => ({
       game_id: pick.gameid,
       picked_team: pick.team,
     }));
-
+  
     try {
       const response = await axios.post('http://localhost:5001/user/make-pick', postData, {
         headers: {
@@ -250,28 +265,27 @@ const HomePage = ({ isAuthenticated, user }) => {
       });
     
       console.log('Response from make pick:', response.data);
+      setPicks(prev => {
+        const newPicks = { ...prev };
+        delete newPicks[date];
+        return newPicks;
+      });
+      setGameVisibility(prev => {
+        const newVisibility = { ...prev };
+        datePicks.forEach(pick => {
+          if (newVisibility[date]) {
+            newVisibility[date][pick.gameid] = false;
+          }
+        });
+        return newVisibility;
+      });
     } catch (error) {
       console.error('Error submitting picks:', error);
     }
-    handleDismissDate(date);
+    finally {
+      setSubmittingStatus(prev => ({ ...prev, [date]: false }));
+    }
   };
-
-  const handleDismissDate = (date) => {
-    setDismissedDates(prev => ({ ...prev, [date]: 'fading' }));
-  
-    setTimeout(() => {
-      setDismissedDates(prev => ({ ...prev, [date]: 'collapsed' }));
-  
-      setTimeout(() => {
-        setVisibleDates(prevDates => {
-          const newDates = { ...prevDates };
-          delete newDates[date];
-          return newDates;
-        });
-      }, 300);
-    }, 300);
-  };
-
 
   const formatDate = (dateString) => {
     const months = ["January", "February", "March", "April", "May", "June",
@@ -298,40 +312,43 @@ const HomePage = ({ isAuthenticated, user }) => {
       {loading ? (
         <p>Loading event details...</p>
       ) : Object.keys(eventsByDate).length > 0 ? (
-        sortDates(Object.keys(eventsByDate)).map((date, index) => (
-          <div key={index}
-          style={{
-            transition: 'opacity 0.3s, height 0.3s',
-            opacity: dismissedDates[date] === 'fading' ? 0 : 1,
-            height: dismissedDates[date] === 'collapsed' ? 0 : 'auto',
-            overflow: 'hidden',
-          }}
-          >
-            <h3 style={{ textAlign: 'center', marginTop: '20px' }}>{formatDate(date)}</h3>
-            {eventsByDate[date].map((event, eventIndex) => (
-              <MatchPick
-                key={eventIndex}
-                homeTeam={event.home_team.toUpperCase()}
-                awayTeam={event.away_team.toUpperCase()}
-                gameid={event.game_id}
-                onPickSelected={(team, gameid) => {
-                  setPicks(currentPicks => ({
-                    ...currentPicks,
-                    [date]: [...(currentPicks[date] || []), { gameid, team }]
-                  }));
-                }}
-              />
-            ))}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-            <button
-                style={makePicksButtonStyle}
-                onClick={() => handleMakePicksForDate(date)}
-            >
-            Make Picks
-            </button>
+        sortDates(Object.keys(eventsByDate)).map((date, index) => {
+          const gamesForDate = eventsByDate[date].filter(game => gameVisibility[date]?.[game.game_id]);
+          return gamesForDate.length > 0 ? (
+            <div key={index} style={{ transition: 'opacity 0.3s, height 0.3s', opacity: 1, overflow: 'hidden' }}>
+              <h3 style={{ textAlign: 'center', marginTop: '20px' }}>{formatDate(date)}</h3>
+              {gamesForDate.map((event, eventIndex) => (
+                <MatchPick
+                  key={eventIndex}
+                  homeTeam={event.home_team.toUpperCase()}
+                  awayTeam={event.away_team.toUpperCase()}
+                  gameid={event.game_id}
+                  onPickSelected={(team, gameid) => {
+                    setPicks(currentPicks => {
+                      const updatedPicks = currentPicks[date] ? currentPicks[date].filter(p => p.gameid !== gameid) : [];
+                      if (team) {
+                        updatedPicks.push({ gameid, team });
+                      }
+                      return {
+                        ...currentPicks,
+                        [date]: updatedPicks,
+                      };
+                    });
+                  }}
+                />
+              ))}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+                <button
+                  style={makePicksButtonStyle}
+                  onClick={() => handleMakePicksForDate(date)}
+                  disabled={submittingStatus[date]}
+                  >
+                  {submittingStatus[date] ? 'Submitting...' : 'Make Picks'}
+                </button>
+              </div>
             </div>
-            </div>
-        ))
+          ) : null;
+        })
       ) : (
         <div align="center">
           <img src={`/HomePage/ballincat.jpg`} alt="All Picks Made" style={{ width: '200px', height: 'auto' }} />
