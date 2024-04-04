@@ -141,7 +141,7 @@ const HomePage = ({ isAuthenticated, user }) => {
           return;
         }
   
-        const eventsPromise = axios.get('http://localhost:5001/scrape/get-events');
+        const eventsPromise = axios.get('http://localhost:5001/data/get-games');
         const picksPromise = axios.get('http://localhost:5001/user/get-picks', {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -156,7 +156,8 @@ const HomePage = ({ isAuthenticated, user }) => {
         const userPicks = new Set(picksResponse.data.map(pick => pick.game_id));
   
         const currentDate = new Date();
-        currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset());
+        currentDate.setMinutes(currentDate.getMinutes());
+        console.log(currentDate)
   
         // TOGGLE WHEN TESTING
         const filteredAndGroupedEvents = events
