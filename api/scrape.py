@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from dateutil.tz import tzutc
 import re
 from flask import Blueprint, jsonify
-from .models import Game, GamePick
+from .models import Game, GamePick, User
 from . import db
 import requests
 from requests import Session
@@ -141,9 +141,9 @@ def get_additional_games(highest_game_id):
                     elif game_date > max_date:
                         #print("Date is out of range for ", game_id_to_check)
                         break
-                    else:
+                    #else:
                         #print("Game already exists for ", game_id_to_check)
-                        print("Contuining to next game")
+                        #print("Contuining to next game")
                 else:
                     print("HREF not found")
                     break
@@ -163,7 +163,7 @@ def update_scores():
     current_date = datetime.utcnow().strftime("%d/%m")
     games_to_update = Game.query.filter(
         Game.winning_team.is_(None),
-        Game.date < current_date 
+        Game.date <= current_date 
     ).all()
     
     for game in games_to_update:
@@ -177,7 +177,11 @@ def update_scores():
             if len(score_elements) >= 2:
                 try:
                     score1 = score_elements[1].text.strip()
+                    if score1 != "":
+                        score1 = int(score1)
                     score2 = score_elements[2].text.strip()
+                    if score2 != "":
+                        score2 = int(score2)
                     game.score = f'{score1} - {score2}'
                     
                     if score1 > score2:
@@ -195,11 +199,16 @@ def update_scores():
             #else:
                 #print(f"Score not found for game {game.game_id}")
 
-        game_picks = GamePick.query.filter_by(result=None).all()
+        game_picks = GamePick.query.filter(GamePick.game_id == game.game_id, GamePick.result == None).all()
         for pick in game_picks:
-            game = Game.query.filter_by(game_id=pick.game_id).first()
-            if game and game.winning_team:
-                pick.result = 1 if pick.picked_team == game.winning_team else 0
+            if game.winning_team:
+                user = User.query.get(pick.user_id)
+                if pick.picked_team == game.winning_team:
+                    pick.result = 1
+                    user.score += 1
+                else:
+                    pick.result = 0
+                    user.losses += 1
                 db.session.commit()
                 
     return jsonify({'message': 'Scores and winning teamsprint("Score 1:", score1) updated, GamePick results updated'}), 200

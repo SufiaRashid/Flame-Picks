@@ -8,6 +8,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     firstName = db.Column(db.String(150))
     lastName = db.Column(db.String(150))
+    score = db.Column(db.Integer, default=0)
+    losses = db.Column(db.Integer, default=0)
 
 class GamePick(db.Model):
     id = db.Column(db.Integer, primary_key=True)

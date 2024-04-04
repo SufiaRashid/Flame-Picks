@@ -35,7 +35,7 @@ def create_app():
     with app.app_context():
         db.create_all()
         from .scrape import update_scores, get_events
-        update_scores()
         get_events()
+        update_scores()
     
     return app
