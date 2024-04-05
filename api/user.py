@@ -49,8 +49,11 @@ def get_picks():
 
     picks_list = [
         {
+            'user_id': pick.user_id,
             'game_id': pick.game_id,
             'picked_team': pick.picked_team,
+            'pick_time': pick.pick_time.strftime("%Y-%m-%d %H:%M:%S"),
+            'result': pick.result
         } for pick in user_picks
     ]
 

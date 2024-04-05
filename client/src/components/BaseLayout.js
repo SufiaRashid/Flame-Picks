@@ -51,6 +51,9 @@ const BaseLayout = ({ children }) => {
                   <Link className="nav-item nav-link" to="/home">
                     <i className="fa fa-fw fa-home"></i> Make Picks
                   </Link>
+                  <Link className="nav-item nav-link" to="/managepicks">
+                    <i className="fa fa-fw fa-history"></i> History
+                  </Link>
                   <Link className="nav-item nav-link" to="/leaderboard">
                     <i className="fa fa-fw fa-list"></i> LeaderBoard
                   </Link>

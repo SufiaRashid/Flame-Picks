@@ -1,6 +1,7 @@
 from . import db 
 from flask_login import UserMixin
 from datetime import datetime
+import pytz
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,7 +17,7 @@ class GamePick(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     game_id = db.Column(db.String(150), nullable=False)
     picked_team = db.Column(db.String(150), nullable=False)
-    pick_time = db.Column(db.DateTime, default=datetime.utcnow)
+    pick_time = db.Column(db.DateTime, default=pytz.timezone('US/Eastern').localize(datetime.now()))
     result = db.Column(db.Integer, nullable=True)
     
     __table_args__ = (db.UniqueConstraint('user_id', 'game_id', name='_user_game_uc'),)
