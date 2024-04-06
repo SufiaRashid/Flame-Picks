@@ -6,11 +6,19 @@ import { getTheme } from '@table-library/react-table-library/baseline';
 import { useSort } from '@table-library/react-table-library/sort';
 import BaseLayout from './BaseLayout';
 
-const adjustDateForEasternTime = (gameDate) => {
+const adjustDateForEasternTime = (gameDate, gameTime) => {
   const [day, month] = gameDate.split('/');
-  const londonDate = new Date(Date.UTC(new Date().getFullYear(), month - 1, day, 0));
+  let [hour, minute] = gameTime.match(/(\d+):(\d+)(am|pm)/).slice(1, 3);
+  hour = parseInt(hour);
+  minute = parseInt(minute);
+  const isPM = gameTime.includes('pm');
+  if (isPM && hour < 12) hour += 12;
+  if (!isPM && hour === 12) hour = 0;
+  const londonDate = new Date(Date.UTC(new Date().getFullYear(), month - 1, day, hour, minute));
   const easternDate = new Date(londonDate.getTime() - 5 * 60 * 60 * 1000);
-  return `${String(easternDate.getUTCMonth() + 1).padStart(2, '0')}/${String(easternDate.getUTCDate()).padStart(2, '0')}`;
+  const adjustedDate = easternDate.getUTCHours() < 5 ?
+    new Date(easternDate.getTime() - 24 * 60 * 60 * 1000) : easternDate;
+  return `${String(adjustedDate.getUTCMonth() + 1).padStart(2, '0')}/${String(adjustedDate.getUTCDate()).padStart(2, '0')}`;
 };
 
 const ManagePicks = () => {
@@ -18,10 +26,14 @@ const ManagePicks = () => {
   const [games, setGames] = useState([]);
   const theme = useTheme(getTheme());
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
-    const fetchGamesAndPicks = async () => {
-      setIsLoading(true);
+    fetchGamesAndPicks(deletingId);
+  }, []);
+    const fetchGamesAndPicks = async (deletingIdParam) => {
+      if(deletingIdParam === null)
+        setIsLoading(true);
       try {
         const token = localStorage.getItem('token');
         const gamesResponse = await axios.get('http://localhost:5001/data/get-games');
@@ -34,8 +46,9 @@ const ManagePicks = () => {
         });
         const enrichedPicks = picksResponse.data.map((pick) => {
           const game = fetchedGames.find((g) => g.game_id === pick.game_id);
-          const gameDateAdjusted = game ? adjustDateForEasternTime(game.date) : 'Unknown Date';
+          const gameDateAdjusted = game ? adjustDateForEasternTime(game.date, game.time) : 'Unknown Date';
           return {
+            id: pick.id,
             ...pick,
             pick_time: new Date(pick.pick_time),
             game: game ? `${game.home_team.toUpperCase()} vs. ${game.away_team.toUpperCase()}` : 'Unknown Game',
@@ -48,12 +61,10 @@ const ManagePicks = () => {
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
+        setDeletingId(null);
         setIsLoading(false);
       }
     };
-  
-    fetchGamesAndPicks();
-  }, []);
 
   const sort = useSort(
     { nodes },
@@ -73,6 +84,18 @@ const ManagePicks = () => {
   function onSortChange(action, state) {
     console.log(action, state);
   }
+
+
+  const deletePick = async (id) => {
+    try {
+      setDeletingId(id);
+      await axios.delete(`http://localhost:5001/data/delete-gamepick/${id}`);
+      fetchGamesAndPicks(id);
+    } catch (error) {
+      console.error('Error deleting pick:', error);
+      setDeletingId(null);
+    }
+  };
 
   const COLUMNS = [
     { label: 'Sport', renderCell: () => 'NBA' },
@@ -98,6 +121,14 @@ const ManagePicks = () => {
       label: 'Result',
       renderCell: (item) =>
         item.result !== null ? (item.result === 1 ? 'Win' : 'Loss') : 'Pending',
+    },
+    {
+      label: 'Action',
+  renderCell: (item) => item.result === null ? (
+    <button onClick={() => deletePick(item.id)} disabled={deletingId === item.id}>
+      {deletingId === item.id ? 'Deleting...' : 'Delete'}
+    </button>
+  ) : null,
     },
   ];
 

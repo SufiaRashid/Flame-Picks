@@ -168,13 +168,16 @@ def get_additional_games(highest_game_id):
 def update_scores():
     #print("IN UPDATE SCORES")
     eastern = pytz.timezone('US/Eastern')
-    current_date = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern).strftime("%d/%m")
-    games_to_update = Game.query.filter(
-        Game.winning_team.is_(None),
-        Game.date <= current_date 
-    ).all()
-    
+    current_date_obj = convert_to_date(datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern).strftime("%d/%m"))
+    games_to_update = []
+    for game in Game.query.filter(Game.winning_team.is_(None)).all():
+        game_date_obj = convert_to_date(game.date)
+        if game_date_obj <= current_date_obj:
+            games_to_update.append(game)
+    if not games_to_update:
+        print("No games to update")
     for game in games_to_update:
+        #print("Updating game ", game.game_id)
         score_url = f'https://www.thesportsdb.com/event/{game.game_id}'
         score_response = requests.get(score_url)
         
@@ -185,12 +188,14 @@ def update_scores():
             if len(score_elements) >= 2:
                 try:
                     score1 = score_elements[1].text.strip()
+                    #print("Score 1:", score1)
                     if score1 != "":
                         score1 = int(score1)
                     score2 = score_elements[2].text.strip()
                     if score2 != "":
                         score2 = int(score2)
                     game.score = f'{score1} - {score2}'
+                    #print("Score 2:", score2)
                     
                     if score1 > score2:
                         game.winning_team = game.home_team
@@ -199,6 +204,7 @@ def update_scores():
                     else:
                         game.winning_team = None
                     
+                    #print("Winning team: ", game.winning_team)
                     db.session.commit()
 
                 except ValueError:
@@ -220,5 +226,9 @@ def update_scores():
                 db.session.commit()
                 
     return jsonify({'message': 'Scores and winning teamsprint("Score 1:", score1) updated, GamePick results updated'}), 200
+
+
+def convert_to_date(date_str, year=2024):
+    return datetime.strptime(f"{date_str}/{year}", "%d/%m/%Y")
 
 

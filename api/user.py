@@ -49,6 +49,7 @@ def get_picks():
 
     picks_list = [
         {
+            'id': pick.id,
             'user_id': pick.user_id,
             'game_id': pick.game_id,
             'picked_team': pick.picked_team,
