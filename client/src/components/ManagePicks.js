@@ -6,6 +6,13 @@ import { getTheme } from '@table-library/react-table-library/baseline';
 import { useSort } from '@table-library/react-table-library/sort';
 import BaseLayout from './BaseLayout';
 
+const adjustDateForEasternTime = (gameDate) => {
+  const [day, month] = gameDate.split('/');
+  const londonDate = new Date(Date.UTC(new Date().getFullYear(), month - 1, day, 0));
+  const easternDate = new Date(londonDate.getTime() - 5 * 60 * 60 * 1000);
+  return `${String(easternDate.getUTCMonth() + 1).padStart(2, '0')}/${String(easternDate.getUTCDate()).padStart(2, '0')}`;
+};
+
 const ManagePicks = () => {
   const [nodes, setNodes] = useState([]);
   const [games, setGames] = useState([]);
@@ -14,38 +21,39 @@ const ManagePicks = () => {
 
   useEffect(() => {
     const fetchGamesAndPicks = async () => {
-        setIsLoading(true);
-        try {
-          const token = localStorage.getItem('token');
-          const gamesResponse = await axios.get('http://localhost:5001/data/get-games');
-          setGames(gamesResponse.data);
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const gamesResponse = await axios.get('http://localhost:5001/data/get-games');
+        const fetchedGames = gamesResponse.data;
   
-          const picksResponse = await axios.get('http://localhost:5001/user/get-picks', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          const enrichedPicks = picksResponse.data.map((pick) => {
-            const game = gamesResponse.data.find((game) => game.game_id === pick.game_id);
-            const gameDateConverted = game ? game.date.split('/').reverse().join('/') : 'Unknown Date';
-            return {
-              ...pick,
-              pick_time: new Date(pick.pick_time),
-              game: game ? `${game.home_team.toUpperCase()} vs. ${game.away_team.toUpperCase()}` : 'Unknown Game',
-              gameDate: gameDateConverted,
-            };
-          });
+        const picksResponse = await axios.get('http://localhost:5001/user/get-picks', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const enrichedPicks = picksResponse.data.map((pick) => {
+          const game = fetchedGames.find((g) => g.game_id === pick.game_id);
+          const gameDateAdjusted = game ? adjustDateForEasternTime(game.date) : 'Unknown Date';
+          return {
+            ...pick,
+            pick_time: new Date(pick.pick_time),
+            game: game ? `${game.home_team.toUpperCase()} vs. ${game.away_team.toUpperCase()}` : 'Unknown Game',
+            gameDate: gameDateAdjusted,
+          };
+        });
   
-          setNodes(enrichedPicks);
-          setIsLoading(false);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-          setIsLoading(false);
-        }
-      };
+        setNodes(enrichedPicks);
+        setGames(fetchedGames);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
   
-      fetchGamesAndPicks();
-    }, []);
+    fetchGamesAndPicks();
+  }, []);
 
   const sort = useSort(
     { nodes },
@@ -99,11 +107,15 @@ const ManagePicks = () => {
 
   return (
     <BaseLayout>
-        <div>
-            <h2>Your Picks</h2>
-            <CompactTable columns={COLUMNS} data={data} theme={theme} sort={sort} />
-            {isLoading && <p>Loading picks...</p>}
-        </div>
+      <div>
+        <h2>Your Picks</h2>
+        <CompactTable columns={COLUMNS} data={data} theme={theme} sort={sort} />
+        {isLoading ? (
+          <p>Loading picks...</p>
+        ) : nodes.length === 0 ? (
+          <p>You have not made any picks.</p>
+        ) : null}
+      </div>
     </BaseLayout>
   );
 };

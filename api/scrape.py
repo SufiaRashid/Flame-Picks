@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from dateutil.tz import tzutc
 import re
 from flask import Blueprint, jsonify
+import pytz
 from .models import Game, GamePick, User
 from . import db
 import requests
@@ -14,12 +15,17 @@ scrape = Blueprint('scrape', __name__)
 
 @scrape.route('/get-events', methods=['GET'])
 def get_events():
-    three_days_from_now = datetime.utcnow() + timedelta(days=3)
+    eastern = pytz.timezone('US/Eastern')
+    three_days_from_now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern) + timedelta(days=3)
+    two_days_from_now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern) + timedelta(days=2)
     game_in_next_three_days = Game.query.filter(
         Game.date <= three_days_from_now.strftime("%d/%m"),
-        Game.date >= datetime.utcnow().strftime("%d/%m")
+        Game.date >= two_days_from_now.strftime("%d/%m")
     ).first()
+    #print("Two days from now: ", two_days_from_now)
+    #print("Three days from now: ", three_days_from_now)
     if game_in_next_three_days:
+        #print("Upcoming games are already in the database. The game is: ", game_in_next_three_days.game_id, " on ", game_in_next_three_days.date)
         return jsonify({'message': 'Upcoming games are already in the database.'}), 200
     
     with Session() as session:
@@ -94,7 +100,8 @@ def get_events():
 def get_additional_games(highest_game_id):
     #print("IN GET ADDITIONAL GAMES")
     additional_games = []
-    current_date = datetime.utcnow().replace(tzinfo=tzutc())
+    eastern = pytz.timezone('US/Eastern')
+    current_date = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern)
     max_date = current_date + timedelta(days=3)
     game_id_to_check = highest_game_id + 1
 
@@ -160,7 +167,8 @@ def get_additional_games(highest_game_id):
 @scrape.route('/update-scores', methods=['GET'])
 def update_scores():
     #print("IN UPDATE SCORES")
-    current_date = datetime.utcnow().strftime("%d/%m")
+    eastern = pytz.timezone('US/Eastern')
+    current_date = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern).strftime("%d/%m")
     games_to_update = Game.query.filter(
         Game.winning_team.is_(None),
         Game.date <= current_date 
