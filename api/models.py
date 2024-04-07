@@ -11,6 +11,9 @@ class User(db.Model, UserMixin):
     lastName = db.Column(db.String(150))
     score = db.Column(db.Integer, default=0)
     losses = db.Column(db.Integer, default=0)
+    timezone = db.Column(db.String(150))
+    theme_preference = db.Column(db.String(50))
+
 
 class GamePick(db.Model):
     id = db.Column(db.Integer, primary_key=True)
