@@ -119,7 +119,7 @@ const SettingsPage = ({ children, user }) => {
       const response = await axios.post(
         `http://localhost:5001/change-password`,
         {
-          email: authData.user?.email,
+          id: authData.user?.id,
           oldPassword: oldPassword,
           newPassword: newPassword,
         }

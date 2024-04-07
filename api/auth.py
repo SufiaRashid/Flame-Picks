@@ -49,13 +49,13 @@ def sign_up():
 
 
 @auth.route('/change-password', methods=['POST'])
-def change_password(user_id):
+def change_password():
     data = request.get_json()
-    email = data.get('email')
+    id = data.get('id')
     old_password = data.get('oldPassword')
     new_password = data.get('newPassword')
 
-    user = User.query.get(user_id)
+    user = User.query.filter_by(id = id).first()
 
     if not user:
         return jsonify({'error': 'User not found.'}), 404
