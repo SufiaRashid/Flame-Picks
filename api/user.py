@@ -81,3 +81,14 @@ def get_losses():
         return jsonify({'error': 'User not found'}), 404
 
     return jsonify({'losses': user.losses}), 200
+
+@user.route('/get-current-user', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    current_user_id = get_jwt_identity()
+    user = User.query.filter_by(id=current_user_id).first()
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    return jsonify({'email': user.email, 'firstName': user.firstName, 'lastName': user.lastName}), 200

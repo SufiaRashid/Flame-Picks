@@ -41,13 +41,16 @@ const SettingsPage = ({ children, user }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
-  const { authData, logout } = useAuth();
+  const { authData, logout, setAuthData } = useAuth();
   const [newFirstName, setNewFirstName] = useState("");
   const [newLastName, setNewLastName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [updateMessage, setUpdateMessage] = useState("");
   const [timezone, setTimezone] = useState(authData.user?.timezone || "");
   const navigate = useNavigate();
+  const [themePreference, setThemePreference] = useState(
+    authData.user.theme_preference || "light"
+  );
 
   useEffect(() => {
     document.body.style.backgroundColor = isDarkMode
@@ -58,6 +61,59 @@ const SettingsPage = ({ children, user }) => {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  const getCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No authentication token found");
+        return;
+      }
+      const response = await axios.get(
+        "http://localhost:5001/user/get-current-user"
+      );
+      const userData = response.data;
+      authData((prevAuthData) => ({
+        ...prevAuthData,
+        user: {
+          ...prevAuthData.user,
+          id: userData.user.id,
+          email: userData.user.email,
+          firstName: userData.user.firstName,
+          lastName: userData.user.lastName,
+        },
+      }));
+
+      console.log("NEW EMAIL??? :", authData.user.email);
+    } catch (error) {
+      console.error("Error fetching current user data:", error);
+    }
+  };
+
+  /////////////////////////////////////
+  /*const handleThemeChange = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5001/data/update-theme/${user.id}`,
+        {
+          theme_preference: themePreference,
+        }
+      );
+
+      // Optionally, you can update the theme preference in the local state
+      // or reload the page to reflect the changes immediately
+      console.log(response.data.message);
+    } catch (error) {
+      console.error("Error updating theme preference:", error);
+    }
+  };
+
+  const toggleDarkMode = () => {
+    const newTheme = themePreference === "light" ? "dark" : "light";
+    setThemePreference(newTheme);
+    handleThemeChange(); // Update theme preference in the database
+  };*/
+  /////////////////////////////////////
 
   const handleUpdateTimezone = async () => {
     try {
@@ -85,22 +141,29 @@ const SettingsPage = ({ children, user }) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // Check if email is a valid email address
-    if (!newEmail || !emailRegex.test(newEmail)) {
-      setUpdateMessage("Please enter a valid email address.");
-      return;
+    if (newEmail !== "") {
+      if (!newEmail || !emailRegex.test(newEmail)) {
+        setUpdateMessage("Please enter a valid email address.");
+        return;
+      }
     }
 
     try {
       const response = await axios.put(
         `http://localhost:5001/data/update-user/${authData.user.id}`,
         {
-          email: newEmail,
-          firstName: newFirstName,
-          lastName: newLastName,
+          email: newEmail || authData.user.email,
+          firstName: newFirstName || authData.user.firstName,
+          lastName: newLastName || authData.user.lastName,
         }
       );
       console.log(response);
+      console.log(authData.user.email);
+      console.log(authData.user.firstName);
+      console.log(authData.user.lastName);
       setUpdateMessage(response.data.message);
+
+      //  getCurrentUser();
     } catch (error) {
       console.log(error);
 

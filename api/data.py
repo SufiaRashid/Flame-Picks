@@ -184,6 +184,18 @@ def update_user(user_id):
     else:
         return jsonify({'message': 'User not found'}), 404
     
+@data.route('/update-theme/<int:user_id>', methods=['PUT'])
+def update_theme_preference(user_id):
+    user = User.query.get(user_id)
+    if user:
+        data = request.get_json()
+        theme_preference = data.get('theme_preference')
+        user.theme_preference = theme_preference
+        db.session.commit()
+        return jsonify({'message': 'Theme preference updated successfully'}), 200
+    else:
+        return jsonify({'message': 'User not found'}), 404
+    
 # USED FOR TESTING ONLY
 @data.route('/get-game/<int:game_id>', methods=['GET'])
 def get_game(game_id):
