@@ -85,8 +85,8 @@ def get_losses():
 @user.route('/get-current-user', methods=['GET'])
 @jwt_required()
 def get_current_user():
-    current_user_id = get_jwt_identity()
-    user = User.query.filter_by(id=current_user_id).first()
+    current_user_email = get_jwt_identity()
+    user = User.query.filter_by(email=current_user_email).first()
 
     if not user:
         return jsonify({'error': 'User not found'}), 404
