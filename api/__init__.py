@@ -1,6 +1,7 @@
 #basic file needed to run all elements of the app and return all
 #the code and logic from the files
 
+import threading
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -34,8 +35,23 @@ def create_app():
 
     with app.app_context():
         db.create_all()
-        from .scrape import get_nba_games, update_scores
-        get_nba_games()
+
+    def run_threaded_function(function):
+        with app.app_context():
+            function()
+
+    from .scrape import get_nba_games, get_epl_games, update_scores
+
+    thread1 = threading.Thread(target=run_threaded_function, args=(get_nba_games,))
+    thread2 = threading.Thread(target=run_threaded_function, args=(get_epl_games,))
+
+    thread1.start()
+    thread2.start()
+
+    thread1.join()
+    thread2.join()
+
+    with app.app_context():
         update_scores()
     
     return app

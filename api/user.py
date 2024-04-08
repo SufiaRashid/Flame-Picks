@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import pytz
 from .models import User, GamePick
 from . import db
+from datetime import datetime
 
 user = Blueprint('user', __name__)
 
@@ -30,7 +32,7 @@ def make_pick():
             response_messages.append({'game_id': game_id, 'message': 'Pick already made'})
             continue
 
-        new_pick = GamePick(user_id=user.id, sport=sport, game_id=game_id, picked_team=picked_team)
+        new_pick = GamePick(user_id=user.id, sport=sport, game_id=game_id, picked_team=picked_team, pick_time=pytz.timezone('US/Eastern').localize(datetime.now()))
         db.session.add(new_pick)
         db.session.commit()
         response_messages.append({'game_id': game_id, 'message': 'Pick saved'})

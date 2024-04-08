@@ -8,10 +8,14 @@ const rowStyle = {
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: '20px',
+  flexWrap: 'wrap',
 };
 
-
 const buttonStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '50px',
   margin: '0 10px',
   padding: '40px 5px',
   fontSize: '1.5rem',
@@ -40,6 +44,21 @@ const selectedButtonStyle = {
   color: '#ffffff',
 };
 
+const sportButtonStyle = {
+  ...buttonStyle,
+  padding: '10px',
+  fontSize: '1rem',
+  width: 'auto',
+  margin: '0 5px',
+};
+
+const selectedSportButtonStyle = {
+  ...selectedButtonStyle,
+  padding: '10px',
+  fontSize: '1rem',
+};
+
+
 const selectedDrawButtonStyle = {
   ...drawButtonStyle,
   borderColor: '#007bff',
@@ -62,7 +81,7 @@ const MatchPick = ({ homeTeam, awayTeam, gameid, onPickSelected }) => {
     alignSelf: 'center',
   };
   const getTeamLogoPath = (teamName) => {
-    return `/NBALogos/${teamName}.png`;
+    return `/Logos/${teamName}.png`;
   };
 
   const logoStyle = {
@@ -130,7 +149,7 @@ const HomePage = ({ isAuthenticated, user }) => {
   const [picks, setPicks] = useState({});
   const [loading, setLoading] = useState(true);
   const [submittingStatus, setSubmittingStatus] = useState({});
-
+  const [selectedSport, setSelectedSport] = useState('NBA');
 
   useEffect(() => {
     const fetchAndGroupEventsByDate = async () => {
@@ -141,7 +160,7 @@ const HomePage = ({ isAuthenticated, user }) => {
           return;
         }
   
-        const eventsPromise = axios.get('http://localhost:5001/data/get-games');
+        const eventsPromise = axios.get(`http://localhost:5001/data/get-games?sport=${selectedSport}`)
         const picksPromise = axios.get('http://localhost:5001/user/get-picks', {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -233,9 +252,9 @@ const HomePage = ({ isAuthenticated, user }) => {
   
     fetchAndGroupEventsByDate();
 
-  }, []);
+  }, [selectedSport]);
 
-  const handleMakePicksForDate = async (date) => {
+  const handleMakePicksForDate = async (date, sport) => {
     setSubmittingStatus(prev => ({ ...prev, [date]: true }));
     const token = localStorage.getItem("token");
     if (!token) {
@@ -255,7 +274,7 @@ const HomePage = ({ isAuthenticated, user }) => {
   
     const postData = datePicks.map(pick => ({
       game_id: pick.gameid,
-      sport: 'NBA',
+      sport: sport,
       picked_team: pick.team,
     }));
   
@@ -309,8 +328,22 @@ const HomePage = ({ isAuthenticated, user }) => {
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
       <h5 align="center" style={{ color: 'rgb(43, 57, 55)', marginBottom: '40px', fontSize: '2.5rem' }}>
-        This Week's NBA Picks
+        This Week's Sports Picks
       </h5>
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
+        <button
+          style={selectedSport === 'NBA' ? selectedSportButtonStyle  : sportButtonStyle}
+          onClick={() => setSelectedSport('NBA')}
+        >
+          NBA
+        </button>
+        <button
+          style={selectedSport === 'EPL' ? selectedSportButtonStyle  : sportButtonStyle}
+          onClick={() => setSelectedSport('EPL')}
+        >
+          EPL
+        </button>
+      </div>
       {loading ? (
         <p>Loading event details...</p>
       ) : Object.keys(eventsByDate).length > 0 ? (
@@ -342,7 +375,7 @@ const HomePage = ({ isAuthenticated, user }) => {
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
                 <button
                   style={makePicksButtonStyle}
-                  onClick={() => handleMakePicksForDate(date)}
+                  onClick={() => handleMakePicksForDate(date, selectedSport)}
                   disabled={submittingStatus[date]}
                   >
                   {submittingStatus[date] ? 'Submitting...' : 'Make Picks'}

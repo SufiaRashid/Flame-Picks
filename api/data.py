@@ -6,10 +6,15 @@ from api.models import Game, GamePick, User
 
 data = Blueprint('data', __name__)
 
-#USED BY HOMEPAGE.JS
 @data.route('/get-games', methods=['GET'])
 def get_all_games():
-    games = Game.query.all()
+    sport = request.args.get('sport')
+
+    if sport:
+        games = Game.query.filter_by(sport=sport).all()
+    else:
+        games = Game.query.all()
+
     games_list = [{
         'sport': game.sport,
         'game_id': game.game_id,
