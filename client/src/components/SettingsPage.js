@@ -82,6 +82,14 @@ const SettingsPage = ({ children, user }) => {
   // make a route to get the current user details authenticated
 
   const handleUpdateAccount = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Check if email is a valid email address
+    if (!newEmail || !emailRegex.test(newEmail)) {
+      setUpdateMessage("Please enter a valid email address.");
+      return;
+    }
+
     try {
       const response = await axios.put(
         `http://localhost:5001/data/update-user/${authData.user.id}`,
@@ -112,6 +120,11 @@ const SettingsPage = ({ children, user }) => {
 
     if (newPassword !== confirmNewPassword) {
       setPasswordMessage("New passwords do not match.");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordMessage("Password must be at least 8 characters long.");
       return;
     }
 
