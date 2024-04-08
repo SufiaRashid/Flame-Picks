@@ -13,162 +13,98 @@ from dateutil import parser
 
 scrape = Blueprint('scrape', __name__)
 
-@scrape.route('/get-events', methods=['GET'])
-def get_events():
-    eastern = pytz.timezone('US/Eastern')
-    three_days_from_now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern) + timedelta(days=3)
-    two_days_from_now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern) + timedelta(days=2)
-    game_in_next_three_days = Game.query.filter(
-        Game.date <= three_days_from_now.strftime("%d/%m"),
-        Game.date >= two_days_from_now.strftime("%d/%m")
-    ).first()
-    #print("Two days from now: ", two_days_from_now)
-    #print("Three days from now: ", three_days_from_now)
-    if game_in_next_three_days:
-        #print("Upcoming games are already in the database. The game is: ", game_in_next_three_days.game_id, " on ", game_in_next_three_days.date)
-        return jsonify({'message': 'Upcoming games are already in the database.'}), 200
-    
+@scrape.route('/get-nba-games', methods=['GET'])
+def get_nba_games():
+    london = pytz.timezone('Europe/London')
+    current_date = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(london)
+    max_date = current_date + timedelta(days=3)
+    max_date_2 = current_date + timedelta(days=4)
+    max_date_obj = convert_to_date(max_date.strftime("%d/%m"))
+    max_date_obj_2 = convert_to_date(max_date_2.strftime("%d/%m"))
+    new_games = []
+
     with Session() as session:
-        #print("IN GET EVENTS")
-        url = 'https://www.thesportsdb.com/league/4387-NBA'
+        url = 'https://www.thesportsdb.com/season/4387-NBA/2023-2024&all=1&view='
         response = session.get(url)
-        
+
         if response.ok:
             soup = BeautifulSoup(response.content, 'html.parser')
-            events_table = soup.find('table', style="width:100%")
-            if not events_table:
-                return jsonify({'error': 'Table not found'}), 404
-            new_games = []
-            highest_game_id = 0
-            rows = events_table.find_all('tr')[1:]
-            for row in rows:
-                event_data = row.find_all('td')
-                if event_data and len(event_data) > 3:
-                    href_element = event_data[1].find('a', href=True)
-                    if href_element:
-                        href = href_element['href']
-                        teams = href.split('/')[-1].split('-vs-')
-                        game_id_str = teams[0].rsplit('-', 3)[0]
-                        home_team = teams[0].rsplit('-', 1)[-1]
-                        away_team = teams[1].rsplit('-', 1)[-1]
-                        date = event_data[0].get_text(strip=True)
-                        score = event_data[2].get_text(strip=True)
-                        time = event_data[5].get_text(strip=True)
+            tables = soup.find_all('table')
+            #print("Number of tables:", len(tables))
+
+            for table in tables:
+                row = table.find('tr')  # Assuming there is only one row per table
+                if row:
+                    cells = row.find_all('td')
+                    if len(cells) > 4:  # Check if there are enough cells
+                        score = cells[4].get_text(strip=True)
+                        #print("Score: ", score)
                         
-                        existing_game = Game.query.filter_by(game_id=game_id_str).first()
-                        if not existing_game:
-                            new_game = Game(
-                                game_id=game_id_str,
-                                home_team=home_team,
-                                away_team=away_team,
-                                date=date,
-                                score=score,
-                                time=time
-                            )
-                            new_games.append(new_game)
-                            if score not in ['-', None]:
-                                highest_game_id = max(highest_game_id, int(game_id_str))
+                        if score == "-":
+                            href_element = cells[3].find('a', href=True)  # Assuming the href is in the fourth cell
+                            if href_element:
+                                href = href_element['href']
+                                game_info = href.split('/')[-1]
+                                game_id = re.search(r'\d+', game_info).group()  # This extracts just the numeric part
+                                teams = game_info.split('-vs-')
+                                home_team = teams[0].rsplit('-', 1)[-1]
+                                away_team = teams[1].rsplit('-', 1)[-1]
+                                #print("Game id: ", game_id)
+                                #print("Home team: ", home_team)
+                                #print("Away team: ", away_team)
 
-            if new_games:
-                db.session.bulk_save_objects(new_games)
-                db.session.commit()  
+                                event_url = f'https://www.thesportsdb.com/event/{game_id}'
+                                event_response = session.get(event_url)
 
-            games_with_score = Game.query.filter(Game.score != '-', Game.score != None).all()
-            games_data = [{
-                'home_team': game.home_team,
-                'away_team': game.away_team,
-                'date': game.date,
-                'score': game.score,
-                'time': game.time,
-                'game_id': game.game_id
-            } for game in games_with_score]                  
+                                if event_response.ok:
+                                    event_soup = BeautifulSoup(event_response.content, 'html.parser')
+                                    timestamp_element = event_soup.find(string=re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}"))
+                                    game_date = parser.parse(timestamp_element.strip())
+                                    formatted_date = game_date.strftime("%d/%m")
+                                    #print("Formatted date: ", formatted_date)
+                                    formatted_time = game_date.strftime("%I:%M%p").lower()
+                                    #print("Formatted time: ", formatted_time)
 
-            if highest_game_id > 0:
-                highest_game_id = max([int(game['game_id']) for game in games_data if game['score'] not in ['-', None]], default=0)
-                #print(f"Highest game ID: {highest_game_id}")
-                additional_game_objects = get_additional_games(highest_game_id)
+                                    if convert_to_date(formatted_date) <= max_date_obj or (convert_to_date(formatted_date) <= max_date_obj_2 and date_parse(formatted_time).time() >= datetime.strptime("12:00am", "%I:%M%p").time() and date_parse(formatted_time).time() <= datetime.strptime("05:00am", "%I:%M%p").time()):
+                                        existing_game = Game.query.filter_by(game_id=game_id).first()
+                                        if not existing_game:
+                                            new_game = Game(
+                                                sport='NBA',
+                                                game_id=game_id,
+                                                home_team=home_team,
+                                                away_team=away_team,
+                                                date=formatted_date,
+                                                score=score,
+                                                time=formatted_time
+                                            )
+                                            new_games.append(new_game)
+                                        pass
+                                    elif convert_to_date(formatted_date) > max_date_obj_2:
+                                        #print("Game date is out of range for id ", game_id)
+                                        break
+                                    else:
+                                        #print("It is on the next day, but the game time is out of range for id ", game_id)
+                                        break
+                        #else:
+                            #print("Score already exists for this game")
+                    #else:
+                        #print("Not enough cells in row to determine game details")
             
-            if highest_game_id>0 and additional_game_objects:
-                db.session.bulk_save_objects(additional_game_objects)
+            if new_games:
+                #print("Saving games to database")
+                db.session.bulk_save_objects(new_games)
                 db.session.commit()
-
-            return jsonify({'message': 'Events successfully updated.'}), 200
-
+                return jsonify({'message': 'New games successfully added'}), 200
+            else:
+                return jsonify({'message': 'No new games found'}), 200
         else:
             return jsonify({'error': 'Failed to retrieve content'}), response.status_code
     
-def get_additional_games(highest_game_id):
-    #print("IN GET ADDITIONAL GAMES")
-    additional_games = []
-    eastern = pytz.timezone('US/Eastern')
-    current_date = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern)
-    max_date = current_date + timedelta(days=3)
-    game_id_to_check = highest_game_id + 1
-
-    while True:
-        #print("Looking at id ", game_id)
-        score_url = f'https://www.thesportsdb.com/event/{game_id_to_check}'
-        response = requests.get(score_url)
-        if response.ok:
-            soup = BeautifulSoup(response.content, 'html.parser')
-            timestamp_element = soup.find(string=re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}"))
-            if timestamp_element:
-                game_date = parser.parse(timestamp_element.strip())
-                formatted_date = game_date.strftime("%d/%m")
-                formatted_time = game_date.strftime("%I:%M%p").lower()
-
-                #print(f"Formatted date: {formatted_date}")
-                #print(f"Formatted time: {formatted_time}")
-
-                href_sport = soup.find_all('a')[45]
-                href_element = soup.find_all('a')[47]
-                #print("HREF ELEMENT: ", href_element)
-                if href_element:
-                    href = href_element['href']
-                    sporthref = href_sport['href']
-                    if "NBA" not in sporthref:
-                        #print("Not an NBA game")
-                        break
-                    teams = href.split('/')[-1].split('-vs-')
-                    home_team = teams[0].rsplit('-', 1)[-1]
-                    #print("Home team: ", home_team)
-                    away_team = teams[1].rsplit('-', 1)[-1]
-                    #print("Away team: ", away_team)
-                    existing_game = Game.query.filter_by(game_id=game_id_to_check).first()
-                    if game_date <= max_date and not existing_game:
-                        new_game = Game(
-                            game_id=str(game_id_to_check),
-                            home_team=home_team,
-                            away_team=away_team,
-                            date=formatted_date,
-                            score="-",
-                            time=formatted_time
-                        )
-                        additional_games.append(new_game)
-                    elif game_date > max_date:
-                        #print("Date is out of range for ", game_id_to_check)
-                        break
-                    #else:
-                        #print("Game already exists for ", game_id_to_check)
-                        #print("Contuining to next game")
-                else:
-                    print("HREF not found")
-                    break
-            else:
-                print("Date element not found")
-                break
-        else:
-            print("Response not OK")
-            break
-        game_id_to_check += 1
-
-    return additional_games
-    
-@scrape.route('/update-scores', methods=['GET'])
+@scrape.route('/update-scores', methods=['PUT'])
 def update_scores():
     #print("IN UPDATE SCORES")
-    eastern = pytz.timezone('US/Eastern')
-    current_date_obj = convert_to_date(datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(eastern).strftime("%d/%m"))
+    london = pytz.timezone('Europe/London')
+    current_date_obj = convert_to_date(datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(london).strftime("%d/%m"))
     games_to_update = []
     for game in Game.query.filter(Game.winning_team.is_(None)).all():
         game_date_obj = convert_to_date(game.date)

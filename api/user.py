@@ -23,13 +23,14 @@ def make_pick():
     for pick_data in picks_data:
         game_id = pick_data.get('game_id')
         picked_team = pick_data.get('picked_team')
+        sport = pick_data.get('sport')
 
         existing_pick = GamePick.query.filter_by(user_id=user.id, game_id=game_id).first()
         if existing_pick:
             response_messages.append({'game_id': game_id, 'message': 'Pick already made'})
             continue
 
-        new_pick = GamePick(user_id=user.id, game_id=game_id, picked_team=picked_team)
+        new_pick = GamePick(user_id=user.id, sport=sport, game_id=game_id, picked_team=picked_team)
         db.session.add(new_pick)
         db.session.commit()
         response_messages.append({'game_id': game_id, 'message': 'Pick saved'})
@@ -50,6 +51,7 @@ def get_picks():
     picks_list = [
         {
             'id': pick.id,
+            'sport': pick.sport,
             'user_id': pick.user_id,
             'game_id': pick.game_id,
             'picked_team': pick.picked_team,

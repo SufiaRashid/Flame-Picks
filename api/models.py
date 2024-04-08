@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
 class GamePick(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    sport = db.Column(db.String(150), nullable=False)
     game_id = db.Column(db.String(150), nullable=False)
     picked_team = db.Column(db.String(150), nullable=False)
     pick_time = db.Column(db.DateTime, default=pytz.timezone('US/Eastern').localize(datetime.now()))
@@ -27,6 +28,7 @@ class GamePick(db.Model):
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    sport = db.Column(db.String(150), nullable=False)
     game_id = db.Column(db.String(150), unique=True, nullable=False)
     home_team = db.Column(db.String(150), nullable=False)
     away_team = db.Column(db.String(150), nullable=False)

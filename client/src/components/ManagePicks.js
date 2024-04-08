@@ -98,7 +98,7 @@ const ManagePicks = () => {
   };
 
   const COLUMNS = [
-    { label: 'Sport', renderCell: () => 'NBA' },
+    { label: 'Sport', renderCell: (item) => item.sport },
     { label: 'Game', renderCell: (item) => item.game },
     {
         label: 'Game Date',

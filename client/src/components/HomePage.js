@@ -255,6 +255,7 @@ const HomePage = ({ isAuthenticated, user }) => {
   
     const postData = datePicks.map(pick => ({
       game_id: pick.gameid,
+      sport: 'NBA',
       picked_team: pick.team,
     }));
   

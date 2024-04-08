@@ -11,6 +11,7 @@ data = Blueprint('data', __name__)
 def get_all_games():
     games = Game.query.all()
     games_list = [{
+        'sport': game.sport,
         'game_id': game.game_id,
         'home_team': game.home_team,
         'away_team': game.away_team,
@@ -29,6 +30,7 @@ def get_all_gamepicks():
     gamepicks_list = [{
         'id': pick.id,
         'user_id': pick.user_id,
+        'sport': pick.sport,
         'game_id': pick.game_id,
         'picked_team': pick.picked_team,
         'pick_time': pick.pick_time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -75,6 +77,7 @@ def post_gamepick():
     data = request.get_json()
     new_gamepick = GamePick(
         user_id=data['user_id'],
+        sport=data['sport'],
         game_id=data['game_id'],
         picked_team=data['picked_team'],
         pick_time=datetime.utcnow(),
@@ -90,6 +93,7 @@ def post_gamepick():
 def post_game():
     data = request.get_json()
     new_game = Game(
+        sport=data['sport'],
         game_id=data['game_id'],
         home_team=data['home_team'],
         away_team=data['away_team'],
@@ -142,6 +146,7 @@ def update_game(game_id):
     game = Game.query.get(game_id)
     if game:
         data = request.get_json()
+        game.sport = data.get('sport', game.sport)
         game.home_team = data.get('home_team', game.home_team)
         game.away_team = data.get('away_team', game.away_team)
         game.date = data.get('date', game.date)
@@ -159,6 +164,7 @@ def update_gamepick(gamepick_id):
     gamepick = GamePick.query.get(gamepick_id)
     if gamepick:
         data = request.get_json()
+        gamepick.sport = data.get('sport', gamepick.sport)
         gamepick.picked_team = data.get('picked_team', gamepick.picked_team)
         gamepick.pick_time = data.get('pick_time', gamepick.pick_time)
         gamepick.result = data.get('result', gamepick.result)
@@ -202,6 +208,7 @@ def get_game(game_id):
     game = Game.query.get(game_id)
     if game:
         game_data = {
+            'sport': game.sport,
             'game_id': game.game_id,
             'home_team': game.home_team,
             'away_team': game.away_team,
@@ -220,6 +227,7 @@ def get_gamepick(gamepick_id):
     gamepick = GamePick.query.get(gamepick_id)
     if gamepick:
         gamepick_data = {
+            'sport': gamepick.sport,
             'id': gamepick.id,
             'user_id': gamepick.user_id,
             'game_id': gamepick.game_id,
