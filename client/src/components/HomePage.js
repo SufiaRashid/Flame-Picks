@@ -33,8 +33,11 @@ const buttonStyle = {
 
 const drawButtonStyle = {
   ...buttonStyle,
-  flex: '0 1 auto',
-  maxWidth: '130px',
+  padding: '10px 20px',
+  fontSize: '0.8rem',
+  margin: '5px auto 0',
+  width: '60px',
+  height: '30px',
 };
 
 const selectedButtonStyle = {
@@ -66,7 +69,7 @@ const selectedDrawButtonStyle = {
   color: '#ffffff',
 };
 
-const MatchPick = ({ homeTeam, awayTeam, gameid, onPickSelected }) => {
+const MatchPick = ({ homeTeam, awayTeam, gameid, onPickSelected, isEPL, isLoading }) => {
   const [pick, setPick] = useState(null);
 
   const handlePick = (team) => {
@@ -75,11 +78,14 @@ const MatchPick = ({ homeTeam, awayTeam, gameid, onPickSelected }) => {
   };
 
   const versusStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
     margin: '0 20px',
     fontWeight: 'bold',
     fontSize: '1rem',
-    alignSelf: 'center',
   };
+
   const getTeamLogoPath = (teamName) => {
     return `/Logos/${teamName}.png`;
   };
@@ -93,21 +99,25 @@ const MatchPick = ({ homeTeam, awayTeam, gameid, onPickSelected }) => {
 
   return (
     <div style={rowStyle}>
-      <img src={getTeamLogoPath(homeTeam)} alt={homeTeam} style={{ ...logoStyle, marginRight: '10px' }} />
-      <button
-        onClick={() => handlePick(homeTeam)}
-        style={pick === homeTeam ? selectedButtonStyle : buttonStyle}
-      >
+      <img src={getTeamLogoPath(homeTeam)} alt={homeTeam} style={logoStyle} />
+      <button onClick={() => handlePick(homeTeam)} style={pick === homeTeam ? selectedButtonStyle : buttonStyle}>
         {homeTeam}
       </button>
-      <div style={versusStyle}>VS.</div>
-      <button
-        onClick={() => handlePick(awayTeam)}
-        style={pick === awayTeam ? selectedButtonStyle : buttonStyle}
-      >
+      <div style={{...versusStyle, flexDirection: 'column' }}>
+        VS.
+        {isEPL && !isLoading && (
+          <button
+            onClick={() => handlePick("Draw")}
+            style={pick === "Draw" ? selectedDrawButtonStyle : drawButtonStyle}
+          >
+            DRAW
+          </button>
+        )}
+      </div>
+      <button onClick={() => handlePick(awayTeam)} style={pick === awayTeam ? selectedButtonStyle : buttonStyle}>
         {awayTeam}
       </button>
-      <img src={getTeamLogoPath(awayTeam)} alt={awayTeam} style={{ ...logoStyle, marginLeft: '10px' }} />
+      <img src={getTeamLogoPath(awayTeam)} alt={awayTeam} style={logoStyle} />
     </div>
   );
 };
@@ -325,6 +335,12 @@ const HomePage = ({ isAuthenticated, user }) => {
     });
   };
 
+  const setSetSelectedSport = (sport) => {
+    if(sport === selectedSport) return;
+    setLoading(true);
+    setSelectedSport(sport);
+  }
+
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
       <h5 align="center" style={{ color: 'rgb(43, 57, 55)', marginBottom: '40px', fontSize: '2.5rem' }}>
@@ -333,13 +349,13 @@ const HomePage = ({ isAuthenticated, user }) => {
       <div style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
         <button
           style={selectedSport === 'NBA' ? selectedSportButtonStyle  : sportButtonStyle}
-          onClick={() => setSelectedSport('NBA')}
+          onClick={() => setSetSelectedSport('NBA')}
         >
           NBA
         </button>
         <button
           style={selectedSport === 'EPL' ? selectedSportButtonStyle  : sportButtonStyle}
-          onClick={() => setSelectedSport('EPL')}
+          onClick={() => setSetSelectedSport('EPL')}
         >
           EPL
         </button>
@@ -370,6 +386,8 @@ const HomePage = ({ isAuthenticated, user }) => {
                       };
                     });
                   }}
+                  isEPL={selectedSport === 'EPL'}
+                  isLoading={loading}
                 />
               ))}
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
@@ -387,7 +405,7 @@ const HomePage = ({ isAuthenticated, user }) => {
       ) : (
         <div align="center">
           <img src={`/HomePage/ballincat.jpg`} alt="All Picks Made" style={{ width: '200px', height: 'auto' }} />
-          <p style={{ fontSize: '1.5rem' }}>Sorry, {authData.user?.firstName}. You have already made all NBA picks for this week.</p>
+          <p style={{ fontSize: '1.5rem' }}>Sorry, {authData.user?.firstName}. You have already made all upcoming picks for the {selectedSport}.</p>
         </div>
       )}
     </BaseLayout>

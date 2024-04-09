@@ -104,7 +104,7 @@ const ManagePicks = () => {
         label: 'Game Date',
         renderCell: (item) => item.gameDate,
     },
-    { label: 'Picked Team', renderCell: (item) => item.picked_team },
+    { label: 'Picked Team', renderCell: (item) => item.picked_team.toUpperCase() },
     {
       label: 'Pick Time',
       renderCell: (item) =>
