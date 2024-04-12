@@ -26,45 +26,43 @@ const ManagePicks = () => {
   const [games, setGames] = useState([]);
   const theme = useTheme(getTheme());
   const [isLoading, setIsLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState(null);
+  const [deletingIds, setDeletingIds] = useState(new Set());
 
   useEffect(() => {
-    fetchGamesAndPicks(deletingId);
+    fetchGamesAndPicks();
   }, []);
-    const fetchGamesAndPicks = async (deletingIdParam) => {
-      if(deletingIdParam === null)
-        setIsLoading(true);
-      try {
-        const token = localStorage.getItem('token');
-        const gamesResponse = await axios.get('http://localhost:5001/data/get-games');
-        const fetchedGames = gamesResponse.data;
+  const fetchGamesAndPicks = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const gamesResponse = await axios.get('http://localhost:5001/data/get-games');
+      const fetchedGames = gamesResponse.data;
   
-        const picksResponse = await axios.get('http://localhost:5001/user/get-picks', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const enrichedPicks = picksResponse.data.map((pick) => {
-          const game = fetchedGames.find((g) => g.game_id === pick.game_id);
-          const gameDateAdjusted = game ? adjustDateForEasternTime(game.date, game.time) : 'Unknown Date';
-          return {
-            id: pick.id,
-            ...pick,
-            pick_time: new Date(pick.pick_time),
-            game: game ? `${game.home_team.toUpperCase()} vs. ${game.away_team.toUpperCase()}` : 'Unknown Game',
-            gameDate: gameDateAdjusted,
-          };
-        });
+      const picksResponse = await axios.get('http://localhost:5001/user/get-picks', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const enrichedPicks = picksResponse.data.map((pick) => {
+        const game = fetchedGames.find((g) => g.game_id === pick.game_id);
+        const gameDateAdjusted = game ? adjustDateForEasternTime(game.date, game.time) : 'Unknown Date';
+        return {
+          id: pick.id,
+          ...pick,
+          pick_time: new Date(pick.pick_time),
+          game: game ? `${game.home_team.toUpperCase()} vs ${game.away_team.toUpperCase()}` : 'Unknown Game',
+          gameDate: gameDateAdjusted,
+        };
+      });
   
-        setNodes(enrichedPicks);
-        setGames(fetchedGames);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setDeletingId(null);
-        setIsLoading(false);
-      }
-    };
+      setNodes(enrichedPicks);
+      setGames(fetchedGames);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const sort = useSort(
     { nodes },
@@ -87,13 +85,18 @@ const ManagePicks = () => {
 
 
   const deletePick = async (id) => {
+    setDeletingIds(prev => new Set(prev.add(id)));
     try {
-      setDeletingId(id);
       await axios.delete(`http://localhost:5001/data/delete-gamepick/${id}`);
-      fetchGamesAndPicks(id);
+      setNodes(prev => prev.filter(pick => pick.id !== id));
     } catch (error) {
       console.error('Error deleting pick:', error);
-      setDeletingId(null);
+    } finally {
+      setDeletingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
     }
   };
 
@@ -125,8 +128,8 @@ const ManagePicks = () => {
     {
       label: 'Action',
   renderCell: (item) => item.result === null ? (
-    <button onClick={() => deletePick(item.id)} disabled={deletingId === item.id}>
-      {deletingId === item.id ? 'Deleting...' : 'Delete'}
+    <button onClick={() => deletePick(item.id)} disabled={deletingIds.has(item.id)}>
+      {deletingIds.has(item.id) ? 'Deleting...' : 'Delete'}
     </button>
   ) : null,
     },
