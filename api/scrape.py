@@ -20,16 +20,26 @@ def get_nba_games():
     max_date = current_date + timedelta(days=3)
     max_date_2 = current_date + timedelta(days=4)
     max_date = max_date.strftime("%d/%m")
+    max_date_3 = current_date + timedelta(days=2)
+    max_date_obj_3 = convert_to_date(max_date_3.strftime("%d/%m"))
     max_date_obj = convert_to_date(max_date)
     max_date_obj_2 = convert_to_date(max_date_2.strftime("%d/%m"))
     new_games = []
+
+    games_check = Game.query.filter(
+            Game.update_date == current_date.strftime("%d/%m"),
+        ).all()
+    
+    if len(games_check) != 0:
+        print("No new NBA games to add (already pulled today)")
+        return jsonify({'message': 'Games for the next 3 days have already been added'}), 200
 
     games = Game.query.filter(
             Game.sport == 'NBA',
         ).all()
     games_after_max_date = [
     game for game in games 
-        if convert_to_date(game.date) >= max_date_obj
+        if convert_to_date(game.date) >= max_date_obj_3
     ]
     #print(games_after_max_date)
     if len(games_after_max_date) != 0:
@@ -88,7 +98,8 @@ def get_nba_games():
                                                 away_team=away_team,
                                                 date=formatted_date,
                                                 score=score,
-                                                time=formatted_time
+                                                time=formatted_time,
+                                                update_date=current_date.strftime("%d/%m")
                                             )
                                             new_games.append(new_game)
                                         pass
@@ -125,6 +136,16 @@ def get_epl_games():
     max_date_obj = convert_to_date(max_date)
     max_date_obj_2 = convert_to_date(max_date_2.strftime("%d/%m"))
     new_games = []
+    break_loop = False
+
+    games_check = Game.query.filter(
+            Game.update_date == current_date.strftime("%d/%m"),
+        ).all()
+    
+    if len(games_check) != 0:
+        print("No new EPL games to add (already pulled today)")
+        return jsonify({'message': 'Games for the next 3 days have already been added'}), 200
+    
     games = Game.query.filter(
             Game.sport == 'EPL',
     ).all()
@@ -147,6 +168,8 @@ def get_epl_games():
             #print("Number of tables:", len(tables))
 
             for table in tables:
+                if break_loop:
+                    break
                 rows = table.find_all('tr')
                 for row in rows:
                     cells = row.find_all('td')
@@ -196,15 +219,144 @@ def get_epl_games():
                                                 away_team=away_team,
                                                 date=formatted_date,
                                                 score=score,
-                                                time=formatted_time
+                                                time=formatted_time,
+                                                update_date=current_date.strftime("%d/%m")
                                             )
                                             new_games.append(new_game)
                                         pass
                                     elif convert_to_date(formatted_date) > max_date_obj_2:
                                         #print("Game date is out of range for id ", game_id)
+                                        break_loop = True
                                         break
                                     else:
                                         #print("It is on the next day, but the game time is out of range for id ", game_id)
+                                        break_loop = True
+                                        break
+                        #else:
+                            #print("Score already exists for this game")
+                    #else:
+                        #print("Not enough cells in row to determine game details: ", row)
+            
+            if new_games:
+                #print("Saving games to database")
+                db.session.bulk_save_objects(new_games)
+                db.session.commit()
+                return jsonify({'message': 'New games successfully added'}), 200
+            else:
+                return jsonify({'message': 'No new games found'}), 200
+        else:
+            return jsonify({'error': 'Failed to retrieve content'}), response.status_code
+        
+@scrape.route('/get-mlb-games', methods=['GET'])
+def get_mlb_games():
+    london = pytz.timezone('Europe/London')
+    current_date = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(london)
+    #print("Current date:", current_date)
+    max_date = current_date + timedelta(days=3)
+    #print("Max date: ", max_date)
+    max_date_2 = current_date + timedelta(days=4)
+    max_date = max_date.strftime("%d/%m")
+    max_date_3 = current_date + timedelta(days=2)
+    max_date_obj_3 = convert_to_date(max_date_3.strftime("%d/%m"))
+    max_date_obj = convert_to_date(max_date)
+    max_date_obj_2 = convert_to_date(max_date_2.strftime("%d/%m"))
+    new_games = []
+    break_loop = False
+
+    games_check = Game.query.filter(
+            Game.update_date == current_date.strftime("%d/%m"),
+        ).all()
+    
+    if len(games_check) != 0:
+        print("No new MLB games to add (already pulled today)")
+        return jsonify({'message': 'Games for the next 3 days have already been added'}), 200
+    
+    games = Game.query.filter(
+            Game.sport == 'MLB',
+    ).all()
+    games_after_max_date = [
+    game for game in games 
+        if convert_to_date(game.date) >= max_date_obj_3
+    ]
+    if len(games_after_max_date) != 0:
+        print("No new MLB games to add")
+        return jsonify({'message': 'Games for the next 3 days have already been added'}), 200
+
+
+    with Session() as session:
+        url = 'https://www.thesportsdb.com/season/4424-MLB/2024&all=1&view='
+        response = session.get(url)
+
+        if response.ok:
+            soup = BeautifulSoup(response.content, 'html.parser')
+            tables = soup.find_all('table')
+            #print("Number of tables:", len(tables))
+
+            for table in tables:
+                if break_loop:
+                    break
+                rows = table.find_all('tr')
+                for row in rows:
+                    cells = row.find_all('td')
+                    if len(cells) > 4:
+                        score = cells[4].get_text(strip=True)
+                        #print("Score: ", score)
+                        
+                        if score == "-":
+                            href_element = cells[3].find('a', href=True)
+                            if href_element:
+                                href = href_element['href']
+                                game_info = href.split('/')[-1]
+                                game_id = re.search(r'\d+', game_info).group()
+                                teams = game_info.split('-vs-')
+                                home_team = teams[0].rsplit('-', 1)[-1]
+                                away_team = teams[1].rsplit('-', 1)[-1]
+
+                                if away_team == 'Jays' or away_team == 'Sox':
+                                    away_team = teams[1].rsplit('-')[-2] + " " + away_team
+
+                                if home_team == 'Jays' or home_team == 'Sox':
+                                    home_team = teams[0].rsplit('-')[-2] + " " + home_team
+
+                                #print("Game id: ", game_id)
+                                #print("Home team: ", home_team)
+                                #print("Away team: ", away_team)
+
+                                event_url = f'https://www.thesportsdb.com/event/{game_id}'
+                                event_response = session.get(event_url)
+
+                                if event_response.ok:
+                                    event_soup = BeautifulSoup(event_response.content, 'html.parser')
+                                    timestamp_element = event_soup.find(string=re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}"))
+                                    game_date = parser.parse(timestamp_element.strip())
+                                    formatted_date = game_date.strftime("%d/%m")
+                                    #print("Formatted date: ", formatted_date)
+                                    formatted_time = game_date.strftime("%I:%M%p").lower()
+                                    #print("Formatted time: ", formatted_time)
+
+                                    if convert_to_date(formatted_date) <= max_date_obj or (convert_to_date(formatted_date) <= max_date_obj_2 and date_parse(formatted_time).time() >= datetime.strptime("12:00am", "%I:%M%p").time() and date_parse(formatted_time).time() <= datetime.strptime("05:00am", "%I:%M%p").time()):
+                                        #print("The game date is ", convert_to_date(formatted_date), " which is less than or equal to ", max_date_obj)
+                                        existing_game = Game.query.filter_by(game_id=game_id).first()
+                                        if not existing_game:
+                                            new_game = Game(
+                                                sport='MLB',
+                                                game_id=game_id,
+                                                home_team=home_team,
+                                                away_team=away_team,
+                                                date=formatted_date,
+                                                score=score,
+                                                time=formatted_time,
+                                                update_date=current_date.strftime("%d/%m")
+                                            )
+                                            new_games.append(new_game)
+                                        pass
+                                    elif convert_to_date(formatted_date) > max_date_obj_2:
+                                        #print("Game date is out of range for id ", game_id)
+                                        break_loop = True
+                                        break
+                                    else:
+                                        #print("It is on the next day, but the game time is out of range for id ", game_id)
+                                        break_loop = True
                                         break
                         #else:
                             #print("Score already exists for this game")
@@ -274,7 +426,7 @@ def update_scores():
         for pick in game_picks:
             if game.winning_team:
                 user = User.query.get(pick.user_id)
-                if pick.picked_team == game.winning_team:
+                if pick.picked_team.upper() == game.winning_team.upper():
                     pick.result = 1
                     user.score += 1
                 else:

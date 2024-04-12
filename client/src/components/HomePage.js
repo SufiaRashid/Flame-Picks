@@ -359,6 +359,12 @@ const HomePage = ({ isAuthenticated, user }) => {
         >
           EPL
         </button>
+        <button
+          style={selectedSport === 'MLB' ? selectedSportButtonStyle  : sportButtonStyle}
+          onClick={() => setSetSelectedSport('MLB')}
+        >
+          MLB
+        </button>
       </div>
       {loading ? (
         <p>Loading event details...</p>

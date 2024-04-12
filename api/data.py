@@ -23,7 +23,8 @@ def get_all_games():
         'date': game.date,
         'score': game.score,
         'time': game.time,
-        'winning_team': game.winning_team
+        'winning_team': game.winning_team,
+        'update_date': game.update_date
     } for game in games]
     
     return jsonify(games_list), 200
@@ -105,7 +106,8 @@ def post_game():
         date=data['date'],
         score=data.get('score', '-'),
         time=data.get('time', '1:00pm'),
-        winning_team=data.get('winning_team') 
+        winning_team=data.get('winning_team'),
+        update_date=datetime.utcnow().strftime("%d/%m")
     )
     db.session.add(new_game)
     db.session.commit()
@@ -220,7 +222,8 @@ def get_game(game_id):
             'date': game.date,
             'score': game.score,
             'time': game.time,
-            'winning_team': game.winning_team
+            'winning_team': game.winning_team,
+            'update_date': game.update_date
         }
         return jsonify(game_data), 200
     else:

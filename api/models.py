@@ -36,3 +36,4 @@ class Game(db.Model):
     score = db.Column(db.String(150), nullable=True)
     time = db.Column(db.String(150), default='1:00pm')
     winning_team = db.Column(db.String(150), nullable=True)
+    update_date = db.Column(db.String(150), default=datetime.now().strftime('%d/%m'))
