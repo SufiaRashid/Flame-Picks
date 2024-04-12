@@ -160,6 +160,11 @@ const HomePage = ({ isAuthenticated, user }) => {
   const [loading, setLoading] = useState(true);
   const [submittingStatus, setSubmittingStatus] = useState({});
   const [selectedSport, setSelectedSport] = useState('NBA');
+  const [allPicksMade, setAllPicksMade] = useState({
+    NBA: false,
+    EPL: false,
+    MLB: false
+  });
 
   useEffect(() => {
     const fetchAndGroupEventsByDate = async () => {
@@ -214,33 +219,6 @@ const HomePage = ({ isAuthenticated, user }) => {
             });
             return acc;
           }, {});
-
-
-          /*  TOGGLE WHEN TESTING
-          const filteredAndGroupedEvents = events
-          .filter(event => {
-            const [day, month] = event.date.split('/').map(Number);
-            const hours = event.time.includes('pm') ? parseInt(event.time) + 12 : parseInt(event.time);
-            const gameDate = new Date(Date.UTC(currentDate.getFullYear(), month - 1, day, hours));
-            return gameDate >= currentDate;
-          })
-          .reduce((acc, event) => {
-            const dateParts = event.date.split('/').map(Number);
-            const timeParts = event.time.match(/(\d+):(\d+)(am|pm)/);
-            let hour = Number(timeParts[1]);
-            if (timeParts[3] === 'pm' && hour !== 12) hour += 12;
-            if (timeParts[3] === 'am' && hour === 12) hour = 0;
-            const gameDate = new Date(Date.UTC(currentDate.getFullYear(), dateParts[1] - 1, dateParts[0], hour));
-            gameDate.setHours(gameDate.getHours() - 4);
-            const adjustedDate = `${gameDate.getDate().toString().padStart(2, '0')}/${(gameDate.getMonth() + 1).toString().padStart(2, '0')}`;
-  
-            acc[adjustedDate] = acc[adjustedDate] || [];
-            acc[adjustedDate].push({
-              ...event,
-              adjustedDate
-            });
-            return acc;
-          }, {});*/
   
         setEventsByDate(filteredAndGroupedEvents);
 
@@ -308,6 +286,7 @@ const HomePage = ({ isAuthenticated, user }) => {
             newVisibility[date][pick.gameid] = false;
           }
         });
+        updateAllPicksMade(selectedSport);
         return newVisibility;
       });
     } catch (error) {
@@ -341,6 +320,19 @@ const HomePage = ({ isAuthenticated, user }) => {
     setSelectedSport(sport);
   }
 
+  const updateAllPicksMade = (sport) => {
+    const allDays = Object.keys(eventsByDate);
+    let allPicked = allDays.every(day => {
+      const gamesForDay = eventsByDate[day];
+      return gamesForDay.every(game => !gameVisibility[day]?.[game.game_id]);
+    });
+  
+    setAllPicksMade(prev => ({
+      ...prev,
+      [sport]: allPicked
+    }));
+  }
+
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
       <h5 align="center" style={{ color: 'rgb(43, 57, 55)', marginBottom: '40px', fontSize: '2.5rem' }}>
@@ -368,7 +360,14 @@ const HomePage = ({ isAuthenticated, user }) => {
       </div>
       {loading ? (
         <p>Loading event details...</p>
-      ) : Object.keys(eventsByDate).length > 0 ? (
+      ) : allPicksMade[selectedSport] ? (
+        <div align="center">
+          <img src={`/HomePage/ballincat.jpg`} alt="All Picks Made" style={{ width: '200px', height: 'auto' }} />
+          <p></p> 
+          <p style={{ fontSize: '1.5rem' }}>You have made all upcoming picks for the {selectedSport}.</p>
+          <p style={{ fontSize: '1.5rem' }}>Visit the "History" page to view your picks.</p>
+        </div>
+      ) : (Object.keys(eventsByDate).length > 0) ? (
         sortDates(Object.keys(eventsByDate)).map((date, index) => {
           const gamesForDate = eventsByDate[date].filter(game => gameVisibility[date]?.[game.game_id]);
           return gamesForDate.length > 0 ? (
@@ -411,7 +410,9 @@ const HomePage = ({ isAuthenticated, user }) => {
       ) : (
         <div align="center">
           <img src={`/HomePage/ballincat.jpg`} alt="All Picks Made" style={{ width: '200px', height: 'auto' }} />
-          <p style={{ fontSize: '1.5rem' }}>Sorry, {authData.user?.firstName}. You have already made all upcoming picks for the {selectedSport}.</p>
+          <p></p> 
+          <p style={{ fontSize: '1.5rem' }}>You have made all upcoming picks for the {selectedSport}.</p>
+          <p style={{ fontSize: '1.5rem' }}>Visit the "History" page to view your picks.</p>
         </div>
       )}
     </BaseLayout>
