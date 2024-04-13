@@ -17,32 +17,87 @@ const AccountPage = () => {
     const [selectedNBATeam, setSelectedNBATeam] = useState('');
 
     // Function to handle profile picture change
+    // Function to handle profile picture change
     const handleProfilePictureChange = (e) => {
-        // Logic to handle image upload and update profile picture
-        // For simplicity, let's just update the state with a new URL
-        setUserInfo({
-            ...userInfo,
-            profilePicture: URL.createObjectURL(e.target.files[0])
-        });
+        const formData = new FormData();
+        formData.append('profilePicture', e.target.files[0]);
+
+        // Assuming you have user's email stored in userInfo
+        const email = userInfo.email;
+
+        fetch(`/api/update-profile-picture/${email}`, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message); // Handle success message
+                setUserInfo({
+                    ...userInfo,
+                    profilePicture: data.profile_picture // Update local state with new profile picture URL
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error); // Handle error
+            });
     };
 
-    // Function to handle selecting favorite NFL team
+// Function to handle selecting favorite NFL team
     const handleSelectFavoriteNFLTeam = (e) => {
         const selectedTeam = e.target.value;
-        setSelectedNFLTeam(''); // Clear selected NFL team
-        setUserInfo({
-            ...userInfo,
-            favoriteNFLTeam: selectedTeam // Update user info with selected NFL team
-        });
+
+        // Assuming you have user's email stored in userInfo
+        const email = userInfo.email;
+
+        fetch('/api/update-favorite-nfl-team', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                favorite_nfl_team: selectedTeam
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message); // Handle success message
+                setUserInfo({
+                    ...userInfo,
+                    favoriteNFLTeam: selectedTeam // Update local state with selected NFL team
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error); // Handle error
+            });
     };
 
-    // Function to handle selecting favorite NBA team
+// Function to handle selecting favorite NBA team
     const handleSelectFavoriteNBATeam = (teamName) => {
-        setSelectedNBATeam(''); // Clear selected NBA team
-        setUserInfo({
-            ...userInfo,
-            favoriteNBATeam: teamName // Update user info with selected NBA team
-        });
+        // Assuming you have user's email stored in userInfo
+        const email = userInfo.email;
+
+        fetch('/api/update-favorite-nba-team', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                favorite_nba_team: teamName
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message); // Handle success message
+                setUserInfo({
+                    ...userInfo,
+                    favoriteNBATeam: teamName // Update local state with selected NBA team
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error); // Handle error
+            });
     };
 
     // List of all 32 NFL teams
