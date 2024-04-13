@@ -13,6 +13,9 @@ class User(db.Model, UserMixin):
     losses = db.Column(db.Integer, default=0)
     timezone = db.Column(db.String(150))
     theme_preference = db.Column(db.String(50))
+    profile_picture = db.Column(db.String(255))  # Add profile picture field
+    favorite_nfl_team = db.Column(db.String(50))  # Add favorite NFL team field
+    favorite_nba_team = db.Column(db.String(50))  # Add favorite NBA team field
 
 
 class GamePick(db.Model):
