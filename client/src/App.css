@@ -70,7 +70,7 @@ body.leaderboard-page-bg {
   font-size: 1.5em; /* font-size to be larger than the default */
   font-weight: bold; /* bold */
   color: #000; /* color to black */
-  text-align: left; 
+  text-align: left;
   margin-left: 1rem; /* add space on the left */
   padding-bottom: 0.5rem; /* add space below the header */
 }
@@ -84,9 +84,9 @@ body.leaderboard-page-bg {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex; 
-  flex-wrap: wrap; 
-  justify-content: space-between; 
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .support-header {
@@ -318,7 +318,7 @@ input:checked + .slider:before {
   font-weight: bold;
 }
 
-info-title {
+.info-title {
   /* FavTeams */
   font-family: Inter;
   font-size: 25px;
