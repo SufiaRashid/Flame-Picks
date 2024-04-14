@@ -1,30 +1,40 @@
 import React, { useEffect, useState } from "react";
 import BaseLayout from "./BaseLayout";
 import "../App.css";
+import axios from 'axios';
 
 const Leaderboard = () => {
-  useEffect(() => {
-    //use useState to constantly update leaderboard from client side once accessible from database
-    document.body.classList.add("leaderboard-page-bg");
+  const [leaderboardData, setLeaderboardData] = useState([]);
 
-    return () => {
-      document.body.classList.remove("leaderboard-page-bg");
+  useEffect(() => {
+    const fetchLeaderboardData = async () => {
+      try {
+        //backend server address
+        const response = await axios.get('http://localhost:5000/get-users');
+        if (response.status === 200) {
+          setLeaderboardData(response.data);
+        } else {
+          console.error('Failed to fetch leaderboard data');
+        }
+      } catch (error) {
+        console.error('Error fetching leaderboard data:', error);
+      }
     };
+
+    fetchLeaderboardData();
   }, []);
 
-  //fetch data from database
-  const leaderboardData = [
-    //match the structure you're planning for your SQLite database
-    { username: "sportsguy_99", record: "145-80", winPercentage: "64.4" },
-    //manual input to test
-  ];
+  // const leaderboardData = [
+  //   //match the structure you're planning for your SQLite database
+  //   // { username: "sportsguy_99", record: "145-80", winPercentage: "64.4" },
+  //   //manual input to test
+  // ];
 
   return (
     <BaseLayout>
       <div className="leaderboard-container">
         {/*adjusted header with new class for styling*/}
         <h3 className="leaderboard-header">Leaderboards</h3>
-        
         <div className="leaderboard-content">
           <table className="leaderboard-table">
             <thead>
@@ -37,11 +47,11 @@ const Leaderboard = () => {
             </thead>
             <tbody>
               {leaderboardData.map((user, index) => (
-                <tr key={user.username}>
+                <tr key={user.id}>
                   <td>#{index + 1}</td>
-                  <td>{user.username}</td>
-                  <td>{user.record}</td>
-                  <td>{user.winPercentage}%</td>
+                  <td>{`${user.firstName} ${user.lastName}`}</td>
+                  <td>{user.score}</td>
+                  <td>{user.losses}</td>
                 </tr>
               ))}
             </tbody>
