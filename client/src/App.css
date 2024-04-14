@@ -70,7 +70,7 @@ body.leaderboard-page-bg {
   font-size: 1.5em; /* font-size to be larger than the default */
   font-weight: bold; /* bold */
   color: #000; /* color to black */
-  text-align: left; 
+  text-align: left;
   margin-left: 1rem; /* add space on the left */
   padding-bottom: 0.5rem; /* add space below the header */
 }
@@ -84,9 +84,9 @@ body.leaderboard-page-bg {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex; 
-  flex-wrap: wrap; 
-  justify-content: space-between; 
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .support-header {
@@ -245,7 +245,7 @@ body.leaderboard-page-bg {
 
 .fullPageDiv {
   position: absolute;
-  top: 10;
+  top: 10%;
   left: 0;
   width: 100%;
   height: 100%;
@@ -303,4 +303,51 @@ input:checked + .slider:before {
   background-color: rgb(10, 75, 39);
   color: white; /* Optionally, change text color to white */
   /* Add any additional styling as needed */
+}
+
+/* Account Page CSS */
+
+.user-info-box {
+  width: 70%; /* Adjust width as needed */
+  margin: 0 auto; /* Center the box horizontally */
+  margin-top: 50px;
+  padding: 20px; /* Add padding inside the box */
+  border-radius: 10px; /* Add rounded corners */
+  background: linear-gradient(to bottom, #e0f2f1, #80cbc4); /* Gradient background */
+  text-align: center; /* Center-align the content */
+  font-weight: bold;
+}
+
+.info-title {
+  /* FavTeams */
+  font-family: Inter;
+  font-size: 25px;
+  text-align: center;
+  font-weight: bolder;
+  color: black; /* Change color as needed */
+}
+
+.info-label {
+  /* Username and Points */
+  font-family: Inter;
+  font-size: 25px;
+  text-align: center;
+  font-weight: bolder;
+  color: black; /* Change color as needed */
+}
+
+.file-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: lightseagreen;
+  color: black;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+}
+
+.file-button:hover {
+  background-color: #0056b3;
 }

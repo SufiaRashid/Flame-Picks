@@ -9,6 +9,7 @@ import AccountPage from "./components/AccountPage";
 import Leaderboard from "./components/Leaderboard";
 import SettingsPage from "./components/SettingsPage";
 import SupportPage from "./components/SupportPage";
+import ManagePicks from "./components/ManagePicks";
 
 function App() {
   return (
@@ -21,6 +22,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <HomePage />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/managepicks"
+            element={
+              <ProtectedRoute>
+                <ManagePicks />
               </ProtectedRoute>
             }
           />

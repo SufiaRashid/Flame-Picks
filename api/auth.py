@@ -3,8 +3,6 @@ from flask_jwt_extended import create_access_token
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
-import requests
-from bs4 import BeautifulSoup
 
 
 auth = Blueprint('auth', __name__)
@@ -18,7 +16,7 @@ def login():
     user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
         access_token = create_access_token(identity=email)
-        return jsonify(access_token=access_token, user={"firstName": user.firstName, "lastName": user.lastName, "email": user.email}), 200
+        return jsonify(access_token=access_token, user={"id": user.id, "firstName": user.firstName, "lastName": user.lastName, "email": user.email}), 200
     return jsonify({'error': 'Invalid credentials'}), 401
 
 @auth.route('/sign-up', methods=['POST'])
@@ -50,44 +48,65 @@ def sign_up():
     return jsonify({'message': 'Account created successfully!'}), 201
 
 
-@auth.route('/get-events', methods=['GET'])
-def get_events():
-    url = 'https://www.thesportsdb.com/league/4387-NBA'
-    response = requests.get(url)
-    events = []
+@auth.route('/change-password', methods=['POST'])
+def change_password():
+    data = request.get_json()
+    id = data.get('id')
+    old_password = data.get('oldPassword')
+    new_password = data.get('newPassword')
 
-    if response.ok:
-        soup = BeautifulSoup(response.content, 'html.parser')
-        events_table = soup.find('table', style="width:100%")
+    user = User.query.filter_by(id = id).first()
 
-        if not events_table:
-            return jsonify({'error': 'Table not found'}), 404
+    if not user:
+        return jsonify({'error': 'User not found.'}), 404
 
-        rows = events_table.find_all('tr')[1:]
+    if not check_password_hash(user.password, old_password):
+        return jsonify({'error': 'Invalid old password.'}), 400
 
-        for row in rows:
-            event_data = row.find_all('td')
-            if event_data and len(event_data) > 3:
-                href_element = event_data[1].find('a', href=True)
-                if href_element:
-                    href = href_element['href']
-                    teams = href.split('/')[-1].split('-vs-')
-                    home_team = teams[0].rsplit('-', 1)[-1]
-                    away_team = teams[1].rsplit('-', 1)[-1]
+    user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+    db.session.commit()
 
-                    date = event_data[0].get_text(strip=True)
-                    score = event_data[2].get_text(strip=True)
-                    time = event_data[5].get_text(strip=True)
+    return jsonify({'message': 'Password changed successfully!'}), 200
 
-                    events.append({
-                        'home_team': home_team, 
-                        'away_team': away_team, 
-                        'date': date, 
-                        'score': score,
-                        'time': time
-                    })
 
-        return jsonify(events)
+@auth.route('/update-account', methods=['POST'])
+def update_account():
+    data = request.get_json()
+    email = data.get('email')
+    new_first_name = data.get('newFirstName')
+    new_last_name = data.get('newLastName')
+    new_email = data.get('newEmail')
 
-    else:
-        return jsonify({'error': 'Failed to retrieve content'}), response.status_code
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({'error': 'User not found.'}), 404
+
+    if new_email:
+        user.email = new_email
+    if new_first_name:
+        user.firstName = new_first_name
+    if new_last_name:
+        user.lastName = new_last_name
+
+    db.session.commit()
+
+    return jsonify({'message': 'Account information updated successfully!'}), 200
+
+# auth.py
+
+@auth.route('/update-timezone', methods=['POST'])
+def update_timezone():
+    data = request.get_json()
+    email = data.get('email')
+    timezone = data.get('timezone')
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({'error': 'User not found.'}), 404
+
+    user.timezone = timezone
+    db.session.commit()
+
+    return jsonify({'message': 'Timezone updated successfully!'}), 200

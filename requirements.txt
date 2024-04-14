@@ -14,3 +14,5 @@ Flask-Mail==0.9.1
 # Other Packages
 requests==2.26.0
 beautifulsoup4==4.12.3
+python-dateutil==2.8.2
+pytz==2024.1
