@@ -46,7 +46,7 @@ const AccountPage = () => {
 
         const email = userInfo.email;
 
-        fetch('http://127.0.0.1:5001/api/update-favorite-nfl-team', {
+        fetch('http://127.0.0.1:5001/update-favorite-nfl-team', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const AccountPage = () => {
 
         const email = userInfo.email;
 
-        fetch('http://127.0.0.1:5001/api/update-favorite-nba-team', {
+        fetch('http://127.0.0.1:5001/update-favorite-nba-team', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ const AccountPage = () => {
 
         // Fetch user information using the JWT token
         if (token) {
-            axios.get('http://127.0.0.1:5001/api/get-current-user', {
+            axios.get('http://127.0.0.1:5001/get-current-user', {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
