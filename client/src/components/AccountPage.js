@@ -14,14 +14,16 @@ const AccountPage = () => {
 
     const [selectedNFLTeam, setSelectedNFLTeam] = useState('');
     const [selectedNBATeam, setSelectedNBATeam] = useState('');
+    const [token, setToken] = useState('');
 
-    const handleProfilePictureChange = (e) => {
+    const handleProfilePictureChange = (e, token) => {
         const formData = new FormData();
         formData.append('profilePicture', e.target.files[0]);
         const email = userInfo.email; // Ensure you have the email stored in userInfo
 
-        axios.post(`http://127.0.0.1:5001/api/update-profile-picture`, formData, {
+        axios.post(`http://127.0.0.1:5001/user/update-profile-picture`, formData, {
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data'
             }
         })
@@ -35,6 +37,8 @@ const AccountPage = () => {
             });
     };
 
+
+
     const handleSelectFavoriteNFLTeam = (e) => {
         const selectedTeam = e.target.value;
         const updatedUserInfo = { ...userInfo, favoriteNFLTeam: selectedTeam };
@@ -45,7 +49,8 @@ const AccountPage = () => {
         fetch('http://127.0.0.1:5001/api/update-favorite-nfl-team', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 email: email,
@@ -74,7 +79,8 @@ const AccountPage = () => {
         fetch('http://127.0.0.1:5001/api/update-favorite-nba-team', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 email: email,
@@ -119,6 +125,7 @@ const AccountPage = () => {
     useEffect(() => {
         // Retrieve JWT token from local storage
         const token = localStorage.getItem('jwtToken');
+        setToken(token);
 
         // Fetch user information using the JWT token
         if (token) {
@@ -184,9 +191,10 @@ const AccountPage = () => {
                                         type="file"
                                         accept="image/*"
                                         id="profile-picture-input"
-                                        onChange={handleProfilePictureChange}
+                                        onChange={(e) => handleProfilePictureChange(e, token)}
                                         style={{ display: 'none' }} // Hide the file input
                                     />
+
                                     <label htmlFor="profile-picture-input" className="file-button">Change Profile Picture</label>
                                 </div>
                                 <select className="file-button" onChange={handleSelectFavoriteNFLTeam}
