@@ -7,6 +7,7 @@ from datetime import datetime
 from flask import current_app, url_for
 from werkzeug.utils import secure_filename
 import os
+from flask import Flask, request, jsonify
 
 user = Blueprint('user', __name__)
 
@@ -100,42 +101,44 @@ def get_current_user():
     
     return jsonify({'email': user.email, 'firstName': user.firstName, 'lastName': user.lastName}), 200
 
-@user.route('/update-profile-picture', methods=['POST'])
-@jwt_required()
+app = Flask(__name__)
+
+UPLOAD_FOLDER = 'uploads'  # Folder where profile pictures will be uploaded
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}  # Allowed file extensions
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Function to check if the file extension is allowed
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/user/update-profile-picture', methods=['POST'])
 def update_profile_picture():
-    current_user_email = get_jwt_identity()
-    user = User.query.filter_by(email=current_user_email).first()
-
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-
+    # Check if the POST request has the file part
     if 'profilePicture' not in request.files:
-        return jsonify({'error': 'No profile picture provided'}), 400
+        return jsonify({'error': 'No file part'}), 400
 
-    profile_picture = request.files['profilePicture']
-    if profile_picture.filename == '':
+    file = request.files['profilePicture']
+
+    # If the user does not select a file, the browser submits an empty file without a filename
+    if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    # Generate a secure filename
-    filename = secure_filename(profile_picture.filename)
+    # Check if the file extension is allowed
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed'}), 400
 
-    # Save the file to a directory accessible via URL
-    directory_path = os.path.join(current_app.root_path, 'static', 'profile_pics')
-    if not os.path.exists(directory_path):
-        os.makedirs(directory_path)  # Ensure the directory exists
+    # Save the uploaded file
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-    file_path = os.path.join(directory_path, filename)
-    profile_picture.save(file_path)
+    # Return the URL of the uploaded profile picture
+    profile_picture_url = f"http://localhost:5001{UPLOAD_FOLDER}/{filename}"  # Replace 'example.com' with your domain
+    return jsonify({'message': 'Profile picture uploaded successfully', 'profilePictureURL': profile_picture_url}), 200
 
-    # Update user's profile picture URL in the database
-    # Assuming you serve static files from the 'static' directory
-    user.profile_picture = url_for('static', filename=f'profile_pics/{filename}', _external=True)
-    db.session.commit()
-
-    return jsonify({
-        'message': 'Profile picture updated successfully!',
-        'profile_picture': user.profile_picture  # Send back the updated profile picture URL
-    }), 200
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 @user.route('/update-favorite-nfl-team', methods=['POST'])
