@@ -2,9 +2,25 @@ import React, { useState, useEffect } from "react";
 import BaseLayout from "./BaseLayout";
 import "../App.css";
 
+//component for notify of email
+function Toast({ message, onClose }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="toast">
+      {message}
+    </div>
+  );
+}
+
 const SupportPage = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     document.body.classList.add("support-page-bg");
@@ -14,10 +30,33 @@ const SupportPage = () => {
     };
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    //handle the form submission here
-    console.log(email, message);
+    const data = { email, message };
+
+    const response = await fetch('http://localhost:5001/mail/send-email', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+        const responseData = await response.json();
+        console.log('Success:', responseData);
+        alert('Email sent successfully!');
+        setToastMessage('Email sent successfully!');
+        setShowToast(true);
+        setEmail('');
+        setMessage('');
+    } else {
+        const errorData = await response.json();
+        console.error('Failed to send email:', errorData);
+        alert('Failed to send email. Please try again later.');
+        setToastMessage('Failed to send email. Please try again later.');
+        setShowToast(true);
+    }
   };
 
   return (

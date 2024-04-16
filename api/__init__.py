@@ -5,9 +5,11 @@ import threading
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_mail import Mail
 
 
 db = SQLAlchemy()
+mail = Mail()
 DB_NAME = "database.db"
 
 
@@ -15,13 +17,23 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'candy'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+
+    #mail config
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USERNAME'] = 'FlamePicksHelp@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'nvsx uass vqyp bmtp'
+
     db.init_app(app)
+    mail.init_app(app)
     CORS(app)
 
     from .auth import auth
     from .scrape import scrape
     from .user import user
     from .data import data
+    from .mail import mail_bp
 
     from flask_jwt_extended import JWTManager
 
@@ -32,6 +44,7 @@ def create_app():
     app.register_blueprint(scrape, url_prefix = '/scrape')
     app.register_blueprint(user, url_prefix = '/user')
     app.register_blueprint(data, url_prefix = '/data')
+    app.register_blueprint(mail_bp, url_prefix='/mail')
 
     with app.app_context():
         db.create_all()
