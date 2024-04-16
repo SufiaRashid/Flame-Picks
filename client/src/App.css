@@ -149,7 +149,34 @@ body.leaderboard-page-bg {
 
 /* add styles specific to the FAQ section here */
 .faq-section {
-  /* FAQ section */
+  margin-top: 20px;
+}
+
+.faq-item {
+  margin-bottom: 10px;
+}
+
+.faq-question {
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  background: #f7f7f7;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background-color: #fff;
+  padding: 0 10px;
+}
+
+.faq-answer.open {
+  max-height: 150px;
+  padding: 10px;
 }
 
 /* used for notify of email sent */

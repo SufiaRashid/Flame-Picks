@@ -16,11 +16,39 @@ function Toast({ message, onClose }) {
   );
 }
 
+function FAQ({ faqs }) {
+  const [activeId, setActiveId] = useState(null);
+
+  const toggle = (id) => {
+    setActiveId(activeId === id ? null : id);
+  };
+
+  return (
+    <div className="faq-section">
+      {faqs.map(faq => (
+        <div key={faq.id} className="faq-item">
+          <button className="faq-question" onClick={() => toggle(faq.id)}>
+            {faq.question}
+          </button>
+          <div className={`faq-answer ${activeId === faq.id ? 'open' : ''}`}>
+            {faq.answer}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const SupportPage = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const faqs = [
+    { id: 1, question: "How do I reset my password?", answer: "Go to your settings page and click on 'Reset Password.'" },
+    { id: 2, question: "Where can I find my pick history?", answer: "Your past picks can be viewed in the 'Pick History' section the webpage." },
+    { id: 3, question: "How do I contact support?", answer: "You can contact us via the support form on this page or directly email us at support@example.com." }
+  ];
 
   useEffect(() => {
     document.body.classList.add("support-page-bg");
@@ -83,8 +111,7 @@ const SupportPage = () => {
             </form>
           </div>
           <div className="support-column">
-            {/* FAQ section goes here */}
-            <p>FAQ Section Coming Soon...</p>
+            <FAQ faqs={faqs} />
           </div>
         </div>
       </div>
