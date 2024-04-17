@@ -143,7 +143,7 @@ const AccountPage = () => {
                             />
 
                         <div className="profile-details">
-                            <p className="info-label"><strong>Username:</strong> {userInfo.username}</p>
+                            <p className="info-label"><strong>Name:</strong> {userInfo.username}</p>
                             <p className="info-label"><strong>Points:</strong> {userInfo.points}</p>
                             <h3 className="info-title">Favorite Teams:</h3>
                             <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
@@ -152,6 +152,9 @@ const AccountPage = () => {
                                 )}
                                 {userInfo.favoriteNBATeam && (
                                     <li>{userInfo.favoriteNBATeam} (NBA)</li>
+                                )}
+                                {!userInfo.favoriteNFLTeam && !userInfo.favoriteNBATeam && (
+                                    <li>(You have not chosen any favorite teams)</li>
                                 )}
                             </ul>
                             {/* Add other account-specific information here */}

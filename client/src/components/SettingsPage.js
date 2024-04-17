@@ -52,15 +52,17 @@ const SettingsPage = ({ children, user }) => {
     authData.user.theme_preference || "light"
   );
 
-  useEffect(() => {
-    document.body.style.backgroundColor = isDarkMode
-      ? "rgb(29, 37, 31)"
-      : "rgb(204, 248, 229)";
-  }, [isDarkMode]);
-
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  useEffect(() => {
+    document.body.classList.add("settings-page-bg");
+
+    return () => {
+      document.body.classList.remove("settings-page-bg");
+    };
+  }, []);
 
   const getCurrentUser = async () => {
     try {

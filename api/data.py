@@ -132,9 +132,11 @@ def delete_gamepick(gamepick_id):
 def delete_user(user_id):
     user = User.query.get(user_id)
     if user:
+        GamePick.query.filter_by(user_id=user_id).delete()
+        
         db.session.delete(user)
         db.session.commit()
-        return jsonify({'message': 'User deleted successfully'}), 200
+        return jsonify({'message': 'User and associated gamepicks deleted successfully'}), 200
     else:
         return jsonify({'message': 'User not found'}), 404
 

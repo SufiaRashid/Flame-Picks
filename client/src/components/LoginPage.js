@@ -64,16 +64,13 @@ const LoginPage = () => {
     <BaseLayout>
       <div align="center">
         <img
-          src="/kitty.jpg"
-          style={{ width: "200px", height: "auto" }}
+          src="/loginlogo.png"
+          style={{ width: "400px", height: "auto" }}
           alt="Avatar"
           className="avatar"
         />
       </div>
       <div>
-        <h5 align="center" style={{ color: "rgb(43, 57, 55)" }}>
-          Welcome returning sports lovers!
-        </h5>
         {message.content && (
           <div
             className={`alert ${
@@ -85,9 +82,6 @@ const LoginPage = () => {
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <h3 align="center" style={{ color: "rgb(30, 139, 121)" }}>
-            Login
-          </h3>
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
             <input

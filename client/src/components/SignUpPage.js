@@ -53,15 +53,17 @@ const SignUpPage = ({ isAuthenticated, user }) => {
         });
         const { access_token, user } = loginResponse.data;
 
-        localStorage.setItem("token", access_token);
-        localStorage.setItem("user", JSON.stringify(user));
-        setAuthData({ isAuthenticated: true, token: access_token, user: user });
-
         setMessage({
           type: "success",
           content: "Account created successfully! Logging you in...",
         });
-        setTimeout(() => navigate("/home"), 2000);
+        setTimeout(() => {
+          localStorage.setItem("token", access_token);
+          localStorage.setItem("user", JSON.stringify(user));
+          setAuthData({ isAuthenticated: true, token: access_token, user: user });
+  
+          navigate("/home");
+        }, 1500);
       }
     } catch (error) {
       const errorMessage =
@@ -75,17 +77,11 @@ const SignUpPage = ({ isAuthenticated, user }) => {
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
       <div align="center">
-        <img
-          src="/kitty2.jpg"
-          style={{ width: "200px", height: "auto" }}
-          alt="Avatar"
-          className="avatar"
-        />
       </div>
       <div>
-        <h5 align="center" style={{ color: "rgb(43, 57, 55)" }}>
-          Join our Flame Picks family!
-        </h5>
+      <h3 align="center" style={{ color: "rgb(30, 139, 121)" }}>
+            SIGN UP
+          </h3>
         {message.content && (
           <div
             className={`alert ${
@@ -97,9 +93,6 @@ const SignUpPage = ({ isAuthenticated, user }) => {
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <h3 align="center" style={{ color: "rgb(30, 139, 121)" }}>
-            Sign Up
-          </h3>
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
             <input

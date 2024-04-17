@@ -10,7 +10,7 @@ const Leaderboard = () => {
     const fetchLeaderboardData = async () => {
       try {
         //backend server address
-        const response = await axios.get('http://localhost:5001/get-users');
+        const response = await axios.get('http://localhost:5001/data/get-users');
         if (response.status === 200) {
           setLeaderboardData(response.data);
         } else {
