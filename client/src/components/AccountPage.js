@@ -33,6 +33,8 @@ const AccountPage = () => {
         }
         if(viewID !== '')
             getProfileInfo();
+        else
+            setUserInfo({username: authData.user?.firstName + " " + authData.user?.lastName, profilePicture: authData.user?.profile_picture, points: authData.user?.score, favoriteNFLTeam: authData.user?.favorite_nfl_team, favoriteNBATeam: authData.user?.favorite_nba_team});
     }, [])
 
     const handleProfilePictureChange = async (e) => {
@@ -159,7 +161,7 @@ const AccountPage = () => {
                             <p>Loading profile pic...</p>
                         ) : (
                             <UserProfilePicture
-                                base64String={userInfo.profilePicture}
+                                base64String={viewID === '' ? authData.user?.profile_picture : userInfo.profilePicture}
                                 style={{
                                     width: '300px',
                                     height: '300px'
@@ -167,17 +169,17 @@ const AccountPage = () => {
                             />
                             )}
                         <div className="profile-details">
-                            <p className="info-label"><strong>Name:</strong> {userInfo.username}</p>
-                            <p className="info-label"><strong>Points:</strong> {userInfo.points}</p>
+                            <p className="info-label"><strong>Name:</strong> {viewID === '' ? authData.user?.firstName + " " + authData.user?.lastName : userInfo.username}</p>
+                            <p className="info-label"><strong>Points:</strong> {viewID === '' ? authData.user?.score : userInfo.points}</p>
                             <h3 className="info-title">Favorite Teams:</h3>
                             <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
-                                {userInfo.favoriteNFLTeam && (
-                                    <li>{userInfo.favoriteNFLTeam} (NFL)</li>
+                                {(viewID === '' || viewID === authData.user?.id) && (
+                                    <>
+                                        <li>{authData.user?.favorite_nfl_team} (NFL)</li>
+                                        <li>{authData.user?.favorite_nba_team} (NBA)</li>
+                                    </>
                                 )}
-                                {userInfo.favoriteNBATeam && (
-                                    <li>{userInfo.favoriteNBATeam} (NBA)</li>
-                                )}
-                                {!userInfo.favoriteNFLTeam && !userInfo.favoriteNBATeam && viewID === '' && (
+                                {!authData.user?.favorite_nfl_team && !authData.user?.favorite_nba_team && viewID === '' && (
                                     <li>(You have not chosen any favorite teams)</li>
                                 )}
                                 {!userInfo.favoriteNFLTeam && !userInfo.favoriteNBATeam && viewID !== '' && (

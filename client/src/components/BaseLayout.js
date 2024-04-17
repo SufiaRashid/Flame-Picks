@@ -23,6 +23,7 @@ const BaseLayout = ({ children }) => {
   };
 
   const handleNavLinkClick = () => {
+    console.log("In handle Nav Link")
     updateViewID('');
   };
 
@@ -63,7 +64,7 @@ const BaseLayout = ({ children }) => {
                   <Link className="nav-item nav-link" to="/leaderboard" onClick={handleNavLinkClick}>
                     <i className="fa fa-fw fa-list"></i> LeaderBoard
                   </Link>
-                  <Link className="nav-item nav-link" to="/account">
+                  <Link className="nav-item nav-link" to="/account" onClick={handleNavLinkClick}>
                     <i className="fa fa-fw fa-user"></i> Account
                   </Link>
                   <Link className="nav-item nav-link" to="/settings" onClick={handleNavLinkClick}>
