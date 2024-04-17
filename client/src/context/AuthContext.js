@@ -35,9 +35,15 @@ export const AuthProvider = ({ children }) => {
     setAuthData({ isAuthenticated: false, token: null, user: null });
   };
 
+  const updateUserAttribute = (attrName, value) => {
+    const updatedUser = { ...authData.user, [attrName]: value };
+    setAuthData({ ...authData, user: updatedUser });
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+};
+
   return (
     <AuthContext.Provider
-      value={{ authData, setAuthData, logout, isDarkMode, setIsDarkMode }}
+      value={{ authData, setAuthData, logout, isDarkMode, setIsDarkMode, updateUserAttribute }}
     >
       {children}
     </AuthContext.Provider>

@@ -16,7 +16,7 @@ def login():
     user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
         access_token = create_access_token(identity=email)
-        return jsonify(access_token=access_token, user={"id": user.id, "firstName": user.firstName, "lastName": user.lastName, "email": user.email}), 200
+        return jsonify(access_token=access_token, user={"id": user.id, "firstName": user.firstName, "lastName": user.lastName, "email": user.email, "score": user.score, "profile_picture": user.profile_picture, "favorite_nba_team": user.favorite_nba_team, "favorite_nfl_team": user.favorite_nfl_team}), 200
     return jsonify({'error': 'Invalid credentials'}), 401
 
 @auth.route('/sign-up', methods=['POST'])

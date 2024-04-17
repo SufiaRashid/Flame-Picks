@@ -5,39 +5,14 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const AccountPage = () => {
-    const { authData} = useAuth();
+    const { authData, updateUserAttribute} = useAuth();
     const [userInfo, setUserInfo] = useState({
         username: authData.user?.firstName + " " + authData.user?.lastName,
-        profilePicture: '',
+        profilePicture: authData.user?.profile_picture,
         points: authData.user?.score, // Default points value
-        favoriteNFLTeam: '', // Default favorite NFL team
-        favoriteNBATeam: '' // Default favorite NBA team
+        favoriteNFLTeam: authData.user?.favorite_nfl_team, // Default favorite NFL team
+        favoriteNBATeam: authData.user?.favorite_nba_team // Default favorite NBA team
     });
-
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        setLoading(true);
-        console.log("In use effect with loading as ", loading)
-        const fetchUserInfo = async () => {
-            console.log("in fetchUserInfo")
-            const token = localStorage.getItem('token');
-            try {
-                const info = await axios.get('http://localhost:5001/user/get-profile-info', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    }
-                });
-                console.log(info.data);
-                setUserInfo(prevUserInfo => ({...prevUserInfo, profilePicture: info.data.profile_picture, points: info.data.score, favoriteNFLTeam: info.data.favorite_nfl_team, favoriteNBATeam: info.data.favorite_nba_team}));
-                setLoading(false);
-            } catch (error) {
-                console.error(error);
-                setLoading(false);
-            }
-        };
-        fetchUserInfo();
-    }, []);
 
     const handleProfilePictureChange = async (e) => {
         const token = localStorage.getItem('token');
@@ -56,14 +31,13 @@ const AccountPage = () => {
             });
         if (response.status === 200) {
             console.log("Response was good. The profile picture is: ", response.data.profile_picture);
+            updateUserAttribute('profile_picture', response.data.profile_picture);
             setUserInfo({...userInfo, profilePicture: response.data.profile_picture});
         }
         else {
             console.log("Status: ", response.status)
         }
     };
-
-
 
     const handleSelectFavoriteNFLTeam = async (e) => {
         const token = localStorage.getItem('token');
@@ -84,6 +58,7 @@ const AccountPage = () => {
             });
         if (response.status === 200) {
             console.log("Response was good. The favorite nfl team is: ", response.data.favorite_nfl_team);
+            updateUserAttribute('favorite_nfl_team', response.data.favorite_nfl_team)
         }
         else {
             console.log("Status: ", response.status)
@@ -109,6 +84,7 @@ const AccountPage = () => {
             });
         if (response.status === 200) {
             console.log("Response was good. The favorite nfl team is: ", response.data.favorite_nba_team);
+            updateUserAttribute('favorite_nba_team', response.data.favorite_nba_team)
         }
         else {
             console.log("Status: ", response.status)
@@ -137,41 +113,34 @@ const AccountPage = () => {
         "Utah Jazz", "Washington Wizards"
     ];
 
-    const UserProfilePicture = ({ base64String }) => {
-        if (!base64String) {
-          return (
-            <img src="default.jpg" alt="User Profile" />
-          );
-        }
-        const imageSrc = base64String ? `data:image/jpeg;base64,${base64String}` : 'path_to_placeholder_image.jpg';
-      
+    const UserProfilePicture = ({ base64String, style }) => {
+        const defaultStyle = {
+            width: '300px',
+            height: '300px',
+            borderRadius: '50%',
+            margin: 'auto',
+            display: 'block',
+            objectFit: 'cover',
+        };
+    
+        const imageSrc = base64String ? `data:image/jpeg;base64,${base64String}` : 'default.jpg';
         return (
-          <img src={imageSrc} alt="User Profile" />
+            <img src={imageSrc} alt="User Profile" style={{ ...defaultStyle, ...style }} />
         );
-      };
+    };
 
     return (
         <BaseLayout>
             <div className="account-page">
                 <div className="user-info-box">
                     <div className="profile-section">
-                        {loading ? (
-                            <p>Loading profile pic...</p>
-                        ) : (
-                            <UserProfilePicture base64String={userInfo.profilePicture}
-                                alt="Profile"
-                                className="profile-picture"
+                            <UserProfilePicture
+                                base64String={userInfo.profilePicture}
                                 style={{
                                     width: '300px',
-                                    height: '300px',
-                                    borderRadius: '50%', // Make it round
-                                    margin: 'auto', // Center align profile picture
-                                    display: 'block',
-                                    marginTop: '10px',
-                                    marginBottom: '30px'
+                                    height: '300px'
                                 }}
                             />
-                        )}
 
                         <div className="profile-details">
                             <p className="info-label"><strong>Username:</strong> {userInfo.username}</p>
