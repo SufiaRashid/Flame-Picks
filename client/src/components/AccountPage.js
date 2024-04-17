@@ -1,106 +1,120 @@
 import React, { useEffect, useState } from 'react';
 import BaseLayout from './BaseLayout';
 import "../App.css";
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const AccountPage = () => {
-    // State to hold user information
+    const { authData} = useAuth();
     const [userInfo, setUserInfo] = useState({
-        username: 'John Doe',
-        profilePicture: 'https://example.com/profile.jpg', // Default profile picture URL
-        points: 100, // Default points value
+        username: authData.user?.firstName + " " + authData.user?.lastName,
+        profilePicture: '',
+        points: authData.user?.score, // Default points value
         favoriteNFLTeam: '', // Default favorite NFL team
         favoriteNBATeam: '' // Default favorite NBA team
     });
 
-    // Separate state variables for selected NFL and NBA teams
-    const [selectedNFLTeam, setSelectedNFLTeam] = useState('');
-    const [selectedNBATeam, setSelectedNBATeam] = useState('');
+    const [loading, setLoading] = useState(true);
 
-    // Function to handle profile picture change
-    // Function to handle profile picture change
-    const handleProfilePictureChange = (e) => {
+    useEffect(() => {
+        setLoading(true);
+        console.log("In use effect with loading as ", loading)
+        const fetchUserInfo = async () => {
+            console.log("in fetchUserInfo")
+            const token = localStorage.getItem('token');
+            try {
+                const info = await axios.get('http://localhost:5001/user/get-profile-info', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                console.log(info.data);
+                setUserInfo(prevUserInfo => ({...prevUserInfo, profilePicture: info.data.profile_picture, points: info.data.score, favoriteNFLTeam: info.data.favorite_nfl_team, favoriteNBATeam: info.data.favorite_nba_team}));
+                setLoading(false);
+            } catch (error) {
+                console.error(error);
+                setLoading(false);
+            }
+        };
+        fetchUserInfo();
+    }, []);
+
+    const handleProfilePictureChange = async (e) => {
+        const token = localStorage.getItem('token');
         const formData = new FormData();
         formData.append('profilePicture', e.target.files[0]);
 
-        // Assuming you have user's email stored in userInfo
-        const email = userInfo.email;
-
-        fetch(`/api/update-profile-picture/${email}`, {
-            method: 'POST',
-            body: formData
+        const response = await axios.post(`http://localhost:5001/user/update-profile-picture`, formData, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message); // Handle success message
-                setUserInfo({
-                    ...userInfo,
-                    profilePicture: data.profile_picture // Update local state with new profile picture URL
-                });
-            })
             .catch(error => {
-                console.error('Error:', error); // Handle error
+                console.error('Error:', error.response.data);
+                return
             });
+        if (response.status === 200) {
+            console.log("Response was good. The profile picture is: ", response.data.profile_picture);
+            setUserInfo({...userInfo, profilePicture: response.data.profile_picture});
+        }
+        else {
+            console.log("Status: ", response.status)
+        }
     };
 
-// Function to handle selecting favorite NFL team
-    const handleSelectFavoriteNFLTeam = (e) => {
+
+
+    const handleSelectFavoriteNFLTeam = async (e) => {
+        const token = localStorage.getItem('token');
         const selectedTeam = e.target.value;
+        const updatedUserInfo = { ...userInfo, favoriteNFLTeam: selectedTeam };
+        setUserInfo(updatedUserInfo);
 
-        // Assuming you have user's email stored in userInfo
-        const email = userInfo.email;
-
-        fetch('/api/update-favorite-nfl-team', {
-            method: 'POST',
+        const response = await axios.post(`http://localhost:5001/user/update-favorite-nfl-team`, {
+            selectedTeam: selectedTeam
+        }, {
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: email,
-                favorite_nfl_team: selectedTeam
-            })
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message); // Handle success message
-                setUserInfo({
-                    ...userInfo,
-                    favoriteNFLTeam: selectedTeam // Update local state with selected NFL team
-                });
-            })
             .catch(error => {
-                console.error('Error:', error); // Handle error
+                console.error('Error:', error.response.data);
             });
+        if (response.status === 200) {
+            console.log("Response was good. The favorite nfl team is: ", response.data.favorite_nfl_team);
+        }
+        else {
+            console.log("Status: ", response.status)
+        }
     };
 
-// Function to handle selecting favorite NBA team
-    const handleSelectFavoriteNBATeam = (teamName) => {
-        // Assuming you have user's email stored in userInfo
-        const email = userInfo.email;
+    const handleSelectFavoriteNBATeam = async (e) => {
+        const token = localStorage.getItem('token');
+        const selectedTeam = e.target.value;
+        const updatedUserInfo = { ...userInfo, favoriteNBATeam: selectedTeam };
+        setUserInfo(updatedUserInfo);
 
-        fetch('/api/update-favorite-nba-team', {
-            method: 'POST',
+        const response = await axios.post(`http://localhost:5001/user/update-favorite-nba-team`, {
+            selectedTeam: selectedTeam
+        }, {
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: email,
-                favorite_nba_team: teamName
-            })
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message); // Handle success message
-                setUserInfo({
-                    ...userInfo,
-                    favoriteNBATeam: teamName // Update local state with selected NBA team
-                });
-            })
             .catch(error => {
-                console.error('Error:', error); // Handle error
+                console.error('Error:', error.response.data);
             });
+        if (response.status === 200) {
+            console.log("Response was good. The favorite nfl team is: ", response.data.favorite_nba_team);
+        }
+        else {
+            console.log("Status: ", response.status)
+        }
     };
 
-    // List of all 32 NFL teams
     const nflTeams = [
         "Arizona Cardinals", "Atlanta Falcons", "Baltimore Ravens", "Buffalo Bills",
         "Carolina Panthers", "Chicago Bears", "Cincinnati Bengals", "Cleveland Browns",
@@ -112,7 +126,6 @@ const AccountPage = () => {
         "Seattle Seahawks", "Tampa Bay Buccaneers", "Tennessee Titans", "Washington Football Team"
     ];
 
-    // List of all 30 NBA teams
     const nbaTeams = [
         "Atlanta Hawks", "Boston Celtics", "Brooklyn Nets", "Charlotte Hornets",
         "Chicago Bulls", "Cleveland Cavaliers", "Dallas Mavericks", "Denver Nuggets",
@@ -122,28 +135,44 @@ const AccountPage = () => {
         "Oklahoma City Thunder", "Orlando Magic", "Philadelphia 76ers", "Phoenix Suns",
         "Portland Trail Blazers", "Sacramento Kings", "San Antonio Spurs", "Toronto Raptors",
         "Utah Jazz", "Washington Wizards"
-        /*Testing this!*/
     ];
+
+    const UserProfilePicture = ({ base64String }) => {
+        if (!base64String) {
+          return (
+            <img src="default.jpg" alt="User Profile" />
+          );
+        }
+        const imageSrc = base64String ? `data:image/jpeg;base64,${base64String}` : 'path_to_placeholder_image.jpg';
+      
+        return (
+          <img src={imageSrc} alt="User Profile" />
+        );
+      };
 
     return (
         <BaseLayout>
             <div className="account-page">
                 <div className="user-info-box">
                     <div className="profile-section">
-                        <img
-                            src={userInfo.profilePicture}
-                            alt="Profile"
-                            className="profile-picture"
-                            style={{
-                                width: '300px',
-                                height: '300px',
-                                borderRadius: '50%', // Make it round
-                                margin: 'auto', // Center align profile picture
-                                display: 'block',
-                                marginTop: '10px',
-                                marginBottom: '30px'
-                            }}
-                        />
+                        {loading ? (
+                            <p>Loading profile pic...</p>
+                        ) : (
+                            <UserProfilePicture base64String={userInfo.profilePicture}
+                                alt="Profile"
+                                className="profile-picture"
+                                style={{
+                                    width: '300px',
+                                    height: '300px',
+                                    borderRadius: '50%', // Make it round
+                                    margin: 'auto', // Center align profile picture
+                                    display: 'block',
+                                    marginTop: '10px',
+                                    marginBottom: '30px'
+                                }}
+                            />
+                        )}
+
                         <div className="profile-details">
                             <p className="info-label"><strong>Username:</strong> {userInfo.username}</p>
                             <p className="info-label"><strong>Points:</strong> {userInfo.points}</p>
@@ -161,36 +190,37 @@ const AccountPage = () => {
                     </div>
 
                     <div className="actions-wrapper" style={{ display: 'flex', justifyContent: 'center' }}>
-                    <div className="actions">
-                        <div style={{ display: 'flex', flexDirection: 'column'}}>
-                            <div className="profile-picture-upload" style={{ marginBottom: '20px', width: '300px' }}>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    id="profile-picture-input"
-                                    onChange={handleProfilePictureChange}
-                                    style={{ display: 'none' }} // Hide the file input
-                                />
-                                <label htmlFor="profile-picture-input" className="file-button">Change Profile Picture</label>
+                        <div className="actions">
+                            <div style={{ display: 'flex', flexDirection: 'column'}}>
+                                <div className="profile-picture-upload" style={{ marginBottom: '20px', width: '300px' }}>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        id="profile-picture-input"
+                                        onChange={(e) => handleProfilePictureChange(e)}
+                                        style={{ display: 'none' }} // Hide the file input
+                                    />
+
+                                    <label htmlFor="profile-picture-input" className="file-button">Change Profile Picture</label>
+                                </div>
+                                <select className="file-button" onChange={handleSelectFavoriteNFLTeam}
+                                        style={{ marginBottom: '20px', width: '300px' }} value={userInfo.favoriteNFLTeam}>
+                                    <option value="" disabled>Select Favorite NFL Team</option>
+                                    {nflTeams.map(team => (
+                                        <option key={team} value={team}>{team}</option>
+                                    ))}
+                                </select>
+                                <select className="file-button" onChange={handleSelectFavoriteNBATeam}
+                                        style={{ marginBottom: '20px', width: '300px' }} value={userInfo.favoriteNBATeam}>
+                                    <option value="" disabled>Select Favorite NBA Team</option>
+                                    {nbaTeams.map(team => (
+                                        <option key={team} value={team}>{team}</option>
+                                    ))}
+                                </select>
                             </div>
-                            <select className="file-button" onChange={handleSelectFavoriteNFLTeam}
-                                    style={{ marginBottom: '20px', width: '300px' }} value={selectedNFLTeam}>
-                                <option value="" disabled>Select Favorite NFL Team</option>
-                                {nflTeams.map(team => (
-                                    <option key={team} value={team}>{team}</option>
-                                ))}
-                            </select>
-                            <select className="file-button" onChange={(e) => handleSelectFavoriteNBATeam(e.target.value)}
-                                    style={{ marginBottom: '20px', width: '300px' }} value={selectedNBATeam}>
-                                <option value="" disabled>Select Favorite NBA Team</option>
-                                {nbaTeams.map(team => (
-                                    <option key={team} value={team}>{team}</option>
-                                ))}
-                            </select>
                         </div>
                     </div>
                 </div>
-            </div>
             </div>
         </BaseLayout>
     );

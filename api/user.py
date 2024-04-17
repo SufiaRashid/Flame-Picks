@@ -1,9 +1,12 @@
+import base64
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import pytz
 from .models import User, GamePick
 from . import db
 from datetime import datetime
+from werkzeug.utils import secure_filename
+from flask import request, jsonify
 
 user = Blueprint('user', __name__)
 
@@ -97,69 +100,96 @@ def get_current_user():
     
     return jsonify({'email': user.email, 'firstName': user.firstName, 'lastName': user.lastName}), 200
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @user.route('/update-profile-picture', methods=['POST'])
 @jwt_required()
 def update_profile_picture():
-    current_user_email = get_jwt_identity()
-    user = User.query.filter_by(email=current_user_email).first()
+    if 'profilePicture' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
 
-    if not user:
+    file = request.files['profilePicture']
+    filename = secure_filename(file.filename)
+    if not allowed_file(filename):
+        return jsonify({'error': 'File type not allowed'}), 400
+
+    file_data = file.read()
+    encoded_image = base64.b64encode(file_data).decode('utf-8')
+
+    current_user_email = get_jwt_identity()
+    current_user = User.query.filter_by(email=current_user_email).first()
+
+    if current_user:
+        current_user.profile_picture = encoded_image
+        db.session.commit()
+
+        return jsonify({'message': 'Profile picture uploaded successfully', 'profile_picture': encoded_image}), 200
+    else:
         return jsonify({'error': 'User not found'}), 404
 
-    if 'profilePicture' not in request.files:
-        return jsonify({'error': 'No profile picture provided'}), 400
-
-    profile_picture = request.files['profilePicture']
-    # Save profile picture to storage (e.g., AWS S3, local filesystem, etc.)
-    # Update user's profile picture field in the database
-    user.profile_picture = profile_picture.filename  # Example: Store filename in database
-
-    db.session.commit()
-
-    # Return updated user object
-    return jsonify({
-        'message': 'Profile picture updated successfully!',
-        'profile_picture': user.profile_picture  # Send back the updated profile picture URL
-    }), 200
 
 @user.route('/update-favorite-nfl-team', methods=['POST'])
 @jwt_required()
 def update_favorite_nfl_team():
-    current_user_email = get_jwt_identity()
-    user = User.query.filter_by(email=current_user_email).first()
+    try:
+        data = request.get_json()
+        selected_team = data.get('selectedTeam')
 
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+        current_user = get_jwt_identity()
+        user = User.query.filter_by(email=current_user).first()
 
-    data = request.json
-    favorite_nfl_team = data.get('favorite_nfl_team')
+        if not user:
+            return jsonify({'error': 'User not found.'}), 404
 
-    user.favorite_nfl_team = favorite_nfl_team
-    db.session.commit()
+        user.favorite_nfl_team = selected_team
+        db.session.commit()
 
-    # Return updated user object
-    return jsonify({
-        'message': 'Favorite NFL team updated successfully!',
-        'favorite_nfl_team': user.favorite_nfl_team  # Send back the updated favorite NFL team
-    }), 200
+        return jsonify({'message': 'Favorite NFL team updated successfully!', 'favorite_nfl_team': selected_team}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @user.route('/update-favorite-nba-team', methods=['POST'])
 @jwt_required()
 def update_favorite_nba_team():
+    try:
+        data = request.get_json()
+        selected_team = data.get('selectedTeam')
+
+        current_user = get_jwt_identity()
+        user = User.query.filter_by(email=current_user).first()
+
+        if not user:
+            return jsonify({'error': 'User not found.'}), 404
+        
+
+        user.favorite_nba_team = selected_team
+        db.session.commit()
+
+        return jsonify({'message': 'Favorite NBA team updated successfully!', 'favorite_nba_team': selected_team}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@user.route('/get-profile-info', methods=['GET'])
+@jwt_required()
+def get_profile_info():
     current_user_email = get_jwt_identity()
     user = User.query.filter_by(email=current_user_email).first()
 
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    data = request.json
-    favorite_nba_team = data.get('favorite_nba_team')
+    favorite_nba_team = user.favorite_nba_team
+    favorite_nfl_team = user.favorite_nfl_team
+    score = user.score
 
-    user.favorite_nba_team = favorite_nba_team
-    db.session.commit()
-
-    # Return updated user object
     return jsonify({
-        'message': 'Favorite NBA team updated successfully!',
-        'favorite_nba_team': user.favorite_nba_team  # Send back the updated favorite NBA team
+        'profile_picture': user.profile_picture,
+        'favorite_nba_team': favorite_nba_team,
+        'favorite_nfl_team': favorite_nfl_team,
+        'score': score
     }), 200

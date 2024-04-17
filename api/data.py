@@ -6,6 +6,7 @@ from api.models import Game, GamePick, User
 
 data = Blueprint('data', __name__)
 
+#USED BY HOMEPAGE.JS
 @data.route('/get-games', methods=['GET'])
 def get_all_games():
     sport = request.args.get('sport')
@@ -56,6 +57,7 @@ def get_all_users():
         'lastName': user.lastName,
         'score': user.score,
         'losses': user.losses,
+        'profile_picture': user.profile_picture
     } for user in users]
 
     return jsonify(users_list), 200
