@@ -173,9 +173,13 @@ const AccountPage = () => {
                             <p className="info-label"><strong>Points:</strong> {viewID === '' ? authData.user?.score : userInfo.points}</p>
                             <h3 className="info-title">Favorite Teams:</h3>
                             <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
-                                {(viewID === '' || viewID === authData.user?.id) && (
+                                {((viewID === '' || viewID === authData.user?.id)) && authData.user?.favorite_nfl_team &&(
                                     <>
                                         <li>{authData.user?.favorite_nfl_team} (NFL)</li>
+                                    </>
+                                )}
+                                {((viewID === '' || viewID === authData.user?.id)) && authData.user?.favorite_nba_team &&(
+                                    <>
                                         <li>{authData.user?.favorite_nba_team} (NBA)</li>
                                     </>
                                 )}
@@ -184,6 +188,16 @@ const AccountPage = () => {
                                 )}
                                 {!userInfo.favoriteNFLTeam && !userInfo.favoriteNBATeam && viewID !== '' && (
                                     <li>({userInfo.username} has not chosen any favorite teams)</li>
+                                )}
+                                {(viewID !== '' && viewID !== authData.user?.id) && userInfo.favoriteNFLTeam &&(
+                                    <>
+                                        <li>{userInfo.favoriteNFLTeam} (NFL)</li>
+                                    </>
+                                )}
+                                {(viewID !== '' && viewID !== authData.user?.id) && userInfo.favoriteNBATeam &&(
+                                    <>
+                                        <li>{userInfo.favoriteNBATeam} (NBA)</li>
+                                    </>
                                 )}
                             </ul>
                             {/* Add other account-specific information here */}
