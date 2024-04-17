@@ -2,9 +2,13 @@ import React, { useEffect, useState } from "react";
 import BaseLayout from "./BaseLayout";
 import "../App.css";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import { useView } from "../context/ViewContext";
 
 const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
+  const { viewID, updateViewID } = useView();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
@@ -22,13 +26,20 @@ const Leaderboard = () => {
     };
 
     fetchLeaderboardData();
-  }, []);
+  }, [viewID]);
 
   // const leaderboardData = [
   //   //match the structure you're planning for your SQLite database
   //   // { username: "sportsguy_99", record: "145-80", winPercentage: "64.4" },
   //   //manual input to test
   // ];
+
+  const handleUserClick = (id) => {
+    console.log('User clicked:', id)
+    updateViewID(id);
+    console.log('View ID:', viewID)
+    navigate('/account');
+  };
 
   return (
     <BaseLayout>
@@ -49,7 +60,9 @@ const Leaderboard = () => {
               {leaderboardData.map((user, index) => (
                 <tr key={user.id}>
                   <td>#{index + 1}</td>
-                  <td>{`${user.firstName} ${user.lastName}`}</td>
+                  <td onClick={() => handleUserClick(user.id)} style={{ cursor: 'pointer' }}>
+                    {`${user.firstName} ${user.lastName}`}
+                  </td>
                   <td>{user.score}</td>
                   <td>{user.losses}</td>
                 </tr>

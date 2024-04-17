@@ -45,7 +45,7 @@ def sign_up():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({'message': 'Account created successfully!'}), 201
+    return jsonify({'message': 'Account created successfully!'}), 200
 
 
 @auth.route('/change-password', methods=['POST'])

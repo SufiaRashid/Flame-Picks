@@ -46,7 +46,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
         password2,
       });
 
-      if (signUpResponse.status === 201) {
+      if (signUpResponse.status === 200) {
         const loginResponse = await axios.post("http://localhost:5001/login", {
           email,
           password: password1,

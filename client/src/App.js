@@ -10,10 +10,12 @@ import Leaderboard from "./components/Leaderboard";
 import SettingsPage from "./components/SettingsPage";
 import SupportPage from "./components/SupportPage";
 import ManagePicks from "./components/ManagePicks";
+import { ViewProvider} from "./context/ViewContext";
 
 function App() {
   return (
     <AuthProvider>
+      <ViewProvider>
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -37,7 +39,7 @@ function App() {
             path="/account"
             element={
               <ProtectedRoute>
-                <AccountPage />
+                <AccountPage/>
               </ProtectedRoute>
             }
           />
@@ -70,6 +72,7 @@ function App() {
           {/* More routes... */}
         </Routes>
       </Router>
+      </ViewProvider>
     </AuthProvider>
   );
 }

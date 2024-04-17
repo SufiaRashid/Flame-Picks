@@ -82,7 +82,11 @@ def get_nba_games():
                                 if event_response.ok:
                                     event_soup = BeautifulSoup(event_response.content, 'html.parser')
                                     timestamp_element = event_soup.find(string=re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}"))
-                                    game_date = parser.parse(timestamp_element.strip())
+                                    try:
+                                        game_date = parser.parse(timestamp_element.strip())
+                                    except AttributeError:
+                                        print("Error parsing game date for game id:", game_id)
+                                        continue
                                     formatted_date = game_date.strftime("%d/%m")
                                     #print("Formatted date: ", formatted_date)
                                     formatted_time = game_date.strftime("%I:%M%p").lower()

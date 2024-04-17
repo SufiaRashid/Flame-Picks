@@ -263,6 +263,9 @@ def get_user(user_id):
             'lastName': user.lastName,
             'score': user.score,
             'losses': user.losses,
+            'profile_picture': user.profile_picture,
+            'favorite_nfl_team': user.favorite_nfl_team,
+            'favorite_nba_team': user.favorite_nba_team
         }
         return jsonify(user_data), 200
     else:

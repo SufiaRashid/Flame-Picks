@@ -5,10 +5,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
 import "https://code.jquery.com/jquery-3.5.1.slim.min.js";
 import "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js";
+import { useView } from "../context/ViewContext";
 
 const BaseLayout = ({ children }) => {
   const [toggleMenu, setToggleMenu] = useState(false);
   const { authData, logout } = useAuth();
+  const { updateViewID } = useView();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -18,6 +20,10 @@ const BaseLayout = ({ children }) => {
 
   const handleToggleMenu = () => {
     setToggleMenu(!toggleMenu);
+  };
+
+  const handleNavLinkClick = () => {
+    updateViewID('');
   };
 
   return (
@@ -48,22 +54,22 @@ const BaseLayout = ({ children }) => {
             <div className="navbar-nav me-auto mb-2 mb-lg-0">
               {authData.isAuthenticated ? (
                 <>
-                  <Link className="nav-item nav-link" to="/home">
+                  <Link className="nav-item nav-link" to="/home" onClick={handleNavLinkClick}>
                     <i className="fa fa-fw fa-home"></i> Make Picks
                   </Link>
-                  <Link className="nav-item nav-link" to="/managepicks">
+                  <Link className="nav-item nav-link" to="/managepicks" onClick={handleNavLinkClick}>
                     <i className="fa fa-fw fa-history"></i> History
                   </Link>
-                  <Link className="nav-item nav-link" to="/leaderboard">
+                  <Link className="nav-item nav-link" to="/leaderboard" onClick={handleNavLinkClick}>
                     <i className="fa fa-fw fa-list"></i> LeaderBoard
                   </Link>
                   <Link className="nav-item nav-link" to="/account">
                     <i className="fa fa-fw fa-user"></i> Account
                   </Link>
-                  <Link className="nav-item nav-link" to="/settings">
+                  <Link className="nav-item nav-link" to="/settings" onClick={handleNavLinkClick}>
                     <i className="fa fa-fw fa-cogs"></i> Settings
                   </Link>
-                  <Link className="nav-item nav-link" to="/support">
+                  <Link className="nav-item nav-link" to="/support" onClick={handleNavLinkClick}>
                     <i className="fa fa-fw fa-wrench"></i> Support
                   </Link>
                 </>

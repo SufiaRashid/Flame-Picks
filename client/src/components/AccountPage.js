@@ -3,16 +3,37 @@ import BaseLayout from './BaseLayout';
 import "../App.css";
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useView } from '../context/ViewContext';
 
 const AccountPage = () => {
     const { authData, updateUserAttribute} = useAuth();
+    const {viewID, updateViewID} = useView();
+    const [loading, setLoading] = useState(false);
     const [userInfo, setUserInfo] = useState({
-        username: authData.user?.firstName + " " + authData.user?.lastName,
-        profilePicture: authData.user?.profile_picture,
-        points: authData.user?.score, // Default points value
-        favoriteNFLTeam: authData.user?.favorite_nfl_team, // Default favorite NFL team
-        favoriteNBATeam: authData.user?.favorite_nba_team // Default favorite NBA team
+        username: viewID === '' ? authData.user?.firstName + " " + authData.user?.lastName : '',
+        profilePicture: viewID === '' ? authData.user?.profile_picture : '',
+        points: viewID === '' ? authData.user?.score : '', // Default points value
+        favoriteNFLTeam: viewID === '' ? authData.user?.favorite_nfl_team : '', // Default favorite NFL team
+        favoriteNBATeam: viewID === '' ? authData.user?.favorite_nba_team : '' // Default favorite NBA team
     });
+
+    useEffect(() => {
+        const getProfileInfo = async () => {
+                console.log("Viewing another user's profile: ", viewID);
+                setLoading(true);
+                    try {
+                        const info = await axios.get(`http://localhost:5001/data/get-user/${viewID}`);
+                        console.log(info.data);
+                        setUserInfo(prevUserInfo => ({...prevUserInfo, username: info.data.firstName + " " + info.data.lastName, profilePicture: info.data.profile_picture, points: info.data.score, favoriteNFLTeam: info.data.favorite_nfl_team, favoriteNBATeam: info.data.favorite_nba_team}));
+                        setLoading(false);
+                    } catch (error) {
+                        console.error(error);
+                        setLoading(false);
+                    }
+        }
+        if(viewID !== '')
+            getProfileInfo();
+    }, [])
 
     const handleProfilePictureChange = async (e) => {
         const token = localStorage.getItem('token');
@@ -134,6 +155,9 @@ const AccountPage = () => {
             <div className="account-page">
                 <div className="user-info-box">
                     <div className="profile-section">
+                    {loading ? (
+                            <p>Loading profile pic...</p>
+                        ) : (
                             <UserProfilePicture
                                 base64String={userInfo.profilePicture}
                                 style={{
@@ -141,7 +165,7 @@ const AccountPage = () => {
                                     height: '300px'
                                 }}
                             />
-
+                            )}
                         <div className="profile-details">
                             <p className="info-label"><strong>Name:</strong> {userInfo.username}</p>
                             <p className="info-label"><strong>Points:</strong> {userInfo.points}</p>
@@ -153,45 +177,50 @@ const AccountPage = () => {
                                 {userInfo.favoriteNBATeam && (
                                     <li>{userInfo.favoriteNBATeam} (NBA)</li>
                                 )}
-                                {!userInfo.favoriteNFLTeam && !userInfo.favoriteNBATeam && (
+                                {!userInfo.favoriteNFLTeam && !userInfo.favoriteNBATeam && viewID === '' && (
                                     <li>(You have not chosen any favorite teams)</li>
+                                )}
+                                {!userInfo.favoriteNFLTeam && !userInfo.favoriteNBATeam && viewID !== '' && (
+                                    <li>({userInfo.username} has not chosen any favorite teams)</li>
                                 )}
                             </ul>
                             {/* Add other account-specific information here */}
                         </div>
                     </div>
 
-                    <div className="actions-wrapper" style={{ display: 'flex', justifyContent: 'center' }}>
-                        <div className="actions">
-                            <div style={{ display: 'flex', flexDirection: 'column'}}>
-                                <div className="profile-picture-upload" style={{ marginBottom: '20px', width: '300px' }}>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        id="profile-picture-input"
-                                        onChange={(e) => handleProfilePictureChange(e)}
-                                        style={{ display: 'none' }} // Hide the file input
-                                    />
+                    {viewID === '' && (
+                        <div className="actions-wrapper" style={{ display: 'flex', justifyContent: 'center' }}>
+                            <div className="actions">
+                                <div style={{ display: 'flex', flexDirection: 'column'}}>
+                                    <div className="profile-picture-upload" style={{ marginBottom: '20px', width: '300px' }}>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            id="profile-picture-input"
+                                            onChange={(e) => handleProfilePictureChange(e)}
+                                            style={{ display: 'none' }} // Hide the file input
+                                        />
 
-                                    <label htmlFor="profile-picture-input" className="file-button">Change Profile Picture</label>
+                                        <label htmlFor="profile-picture-input" className="file-button">Change Profile Picture</label>
+                                    </div>
+                                    <select className="file-button" onChange={handleSelectFavoriteNFLTeam}
+                                            style={{ marginBottom: '20px', width: '300px' }} value={userInfo.favoriteNFLTeam}>
+                                        <option value="" disabled>Select Favorite NFL Team</option>
+                                        {nflTeams.map(team => (
+                                            <option key={team} value={team}>{team}</option>
+                                        ))}
+                                    </select>
+                                    <select className="file-button" onChange={handleSelectFavoriteNBATeam}
+                                            style={{ marginBottom: '20px', width: '300px' }} value={userInfo.favoriteNBATeam}>
+                                        <option value="" disabled>Select Favorite NBA Team</option>
+                                        {nbaTeams.map(team => (
+                                            <option key={team} value={team}>{team}</option>
+                                        ))}
+                                    </select>
                                 </div>
-                                <select className="file-button" onChange={handleSelectFavoriteNFLTeam}
-                                        style={{ marginBottom: '20px', width: '300px' }} value={userInfo.favoriteNFLTeam}>
-                                    <option value="" disabled>Select Favorite NFL Team</option>
-                                    {nflTeams.map(team => (
-                                        <option key={team} value={team}>{team}</option>
-                                    ))}
-                                </select>
-                                <select className="file-button" onChange={handleSelectFavoriteNBATeam}
-                                        style={{ marginBottom: '20px', width: '300px' }} value={userInfo.favoriteNBATeam}>
-                                    <option value="" disabled>Select Favorite NBA Team</option>
-                                    {nbaTeams.map(team => (
-                                        <option key={team} value={team}>{team}</option>
-                                    ))}
-                                </select>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </BaseLayout>
