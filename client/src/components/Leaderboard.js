@@ -16,7 +16,12 @@ const Leaderboard = () => {
         //backend server address
         const response = await axios.get('http://localhost:5001/data/get-users');
         if (response.status === 200) {
-          setLeaderboardData(response.data);
+          const sortedData = response.data.sort((a, b) => {
+            const percentageA = calculatePercentage(a.score, a.losses);
+            const percentageB = calculatePercentage(b.score, b.losses);
+            return percentageB - percentageA;
+          });
+          setLeaderboardData(sortedData);
         } else {
           console.error('Failed to fetch leaderboard data');
         }
@@ -28,17 +33,19 @@ const Leaderboard = () => {
     fetchLeaderboardData();
   }, [viewID]);
 
-  // const leaderboardData = [
-  //   //match the structure you're planning for your SQLite database
-  //   // { username: "sportsguy_99", record: "145-80", winPercentage: "64.4" },
-  //   //manual input to test
-  // ];
-
   const handleUserClick = (id) => {
     console.log('User clicked:', id)
     updateViewID(id);
     console.log('View ID:', viewID)
     navigate('/account');
+  };
+
+  const calculatePercentage = (wins, losses) => {
+    if (wins === 0 && losses === 0) {
+      const value = 0;
+      return value.toFixed(1);
+    }
+    return ((wins / (wins + losses)) * 100).toFixed(1);
   };
 
   return (
@@ -63,8 +70,8 @@ const Leaderboard = () => {
                   <td onClick={() => handleUserClick(user.id)} style={{ cursor: 'pointer' }}>
                     {`${user.firstName} ${user.lastName}`}
                   </td>
-                  <td>{user.score}</td>
-                  <td>{user.losses}</td>
+                  <td>{user.score} - {user.losses}</td>
+                  <td>{calculatePercentage(user.score, user.losses)}%</td>
                 </tr>
               ))}
             </tbody>
