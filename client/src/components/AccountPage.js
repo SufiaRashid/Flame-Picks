@@ -7,11 +7,12 @@ import { useView } from '../context/ViewContext';
 
 const AccountPage = () => {
     const { authData, updateUserAttribute} = useAuth();
-    const {viewID, updateViewID} = useView();
+    const {viewID} = useView();
     const [loading, setLoading] = useState(false);
+    const [profilePicError, setProfilePicError] = useState('');
     const [userInfo, setUserInfo] = useState({
         username: viewID === '' ? authData.user?.firstName + " " + authData.user?.lastName : '',
-        profilePicture: viewID === '' ? authData.user?.profile_picture : '',
+        profilePicture: (viewID === '' || authData.user?.profile_picture === 'large') ? authData.user?.profile_picture : '',
         points: viewID === '' ? authData.user?.score : '', // Default points value
         favoriteNFLTeam: viewID === '' ? authData.user?.favorite_nfl_team : '', // Default favorite NFL team
         favoriteNBATeam: viewID === '' ? authData.user?.favorite_nba_team : '' // Default favorite NBA team
@@ -22,7 +23,15 @@ const AccountPage = () => {
                 console.log("Viewing another user's profile: ", viewID);
                 setLoading(true);
                     try {
-                        const info = await axios.get(`http://localhost:5001/data/get-user/${viewID}`);
+                        if(viewID === '')
+                        {
+                            console.log("Pulling info from own profile");
+                            var info = await axios.get(`http://localhost:5001/data/get-user/${authData.user?.id}`);
+                        }
+                        else
+                        {
+                            var info = await axios.get(`http://localhost:5001/data/get-user/${viewID}`);
+                        }
                         console.log(info.data);
                         setUserInfo(prevUserInfo => ({...prevUserInfo, username: info.data.firstName + " " + info.data.lastName, profilePicture: info.data.profile_picture, points: info.data.score, favoriteNFLTeam: info.data.favorite_nfl_team, favoriteNBATeam: info.data.favorite_nba_team}));
                         setLoading(false);
@@ -31,7 +40,7 @@ const AccountPage = () => {
                         setLoading(false);
                     }
         }
-        if(viewID !== '')
+        if(viewID !== '' || authData.user?.profile_picture === 'large')
             getProfileInfo();
         else
             setUserInfo({username: authData.user?.firstName + " " + authData.user?.lastName, profilePicture: authData.user?.profile_picture, points: authData.user?.score, favoriteNFLTeam: authData.user?.favorite_nfl_team, favoriteNBATeam: authData.user?.favorite_nba_team});
@@ -40,21 +49,47 @@ const AccountPage = () => {
     const handleProfilePictureChange = async (e) => {
         const token = localStorage.getItem('token');
         const formData = new FormData();
+        var large = false;
+        const file = e.target.files[0];
+        if (!file) {
+            console.log('No file selected.');
+            return;
+        }
         formData.append('profilePicture', e.target.files[0]);
+        const fileSize = file.size / 1024 / 1024;
+        const allowedExtensions = ['png', 'jpg', 'jpeg'];
+        const fileExtension = e.target.files[0].name.split('.').pop().toLowerCase();
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            console.log('Invalid file extension. Only PNG, JPG, and JPEG files are allowed.');
+            setProfilePicError('Invalid file type. Only PNG, JPG, and JPEG are allowed.');
+            return;
+        }
+        else if (fileSize > 5) {
+            console.log('File is large. It cannot be stored in local storage.');
+            updateUserAttribute('profile_picture', 'large');
+            large = true;
+            setProfilePicError('');
+        }
+        else{
+            setProfilePicError('');
+        }
 
         const response = await axios.post(`http://localhost:5001/user/update-profile-picture`, formData, {
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data'
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
             }
         })
             .catch(error => {
-                console.error('Error:', error.response.data);
-                return
+            console.log("Caught error!")
+            console.error('Error:', error.response.data);
+            return Promise.reject(error);
             });
         if (response.status === 200) {
             console.log("Response was good. The profile picture is: ", response.data.profile_picture);
-            updateUserAttribute('profile_picture', response.data.profile_picture);
+            if(!large)
+                updateUserAttribute('profile_picture', response.data.profile_picture);
             setUserInfo({...userInfo, profilePicture: response.data.profile_picture});
         }
         else {
@@ -81,7 +116,7 @@ const AccountPage = () => {
             });
         if (response.status === 200) {
             console.log("Response was good. The favorite nfl team is: ", response.data.favorite_nfl_team);
-            updateUserAttribute('favorite_nfl_team', response.data.favorite_nfl_team)
+            updateUserAttribute('favorite_nfl_team', response.data.favorite_nfl_team);
         }
         else {
             console.log("Status: ", response.status)
@@ -161,7 +196,7 @@ const AccountPage = () => {
                             <p>Loading profile pic...</p>
                         ) : (
                             <UserProfilePicture
-                                base64String={viewID === '' ? authData.user?.profile_picture : userInfo.profilePicture}
+                                base64String={(viewID === '' && authData.user?.profile_picture !== 'large') ? authData.user?.profile_picture : userInfo.profilePicture}
                                 style={{
                                     width: '300px',
                                     height: '300px'
@@ -209,6 +244,11 @@ const AccountPage = () => {
                             <div className="actions">
                                 <div style={{ display: 'flex', flexDirection: 'column'}}>
                                     <div className="profile-picture-upload" style={{ marginBottom: '20px', width: '300px' }}>
+                                    {profilePicError && (
+                                        <div className="alert alert-danger" role="alert">
+                                            {profilePicError}
+                                        </div>
+                                    )}
                                         <input
                                             type="file"
                                             accept="image/*"
