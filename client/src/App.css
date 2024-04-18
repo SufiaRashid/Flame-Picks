@@ -188,7 +188,7 @@ body.leaderboard-page-bg {
   color: white;
   padding: 16px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 }
 
@@ -353,7 +353,11 @@ input:checked + .slider:before {
   margin-top: 50px;
   padding: 20px; /* Add padding inside the box */
   border-radius: 10px; /* Add rounded corners */
-  background: linear-gradient(to bottom, #e0f2f1, #80cbc4); /* Gradient background */
+  background: linear-gradient(
+    to bottom,
+    #e0f2f1,
+    #80cbc4
+  ); /* Gradient background */
   text-align: center; /* Center-align the content */
   font-weight: bold;
 }
@@ -390,4 +394,9 @@ input:checked + .slider:before {
 
 .file-button:hover {
   background-color: #0056b3;
+}
+
+.biography-list li:not(:last-child) {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px; /* Optional: Add padding between biographies */
 }

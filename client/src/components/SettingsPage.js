@@ -299,20 +299,6 @@ const SettingsPage = ({ children, user }) => {
             </li>
           </ul>
         </Accordion>
-        <Accordion title="Theme Settings" icon="fa fa-adjust">
-          <ul>
-            <li>
-              <label className="toggle">
-                <input
-                  type="checkbox"
-                  checked={isDarkMode}
-                  onChange={toggleDarkMode}
-                />
-                <span className="slider"></span>
-              </label>
-            </li>
-          </ul>
-        </Accordion>
         <Accordion title="Timezone Settings" icon="fa fa-clock-o">
           <ul>
             <li>
@@ -390,19 +376,67 @@ const SettingsPage = ({ children, user }) => {
             {passwordMessage && <li>{passwordMessage}</li>}
           </ul>
         </Accordion>
-        <Accordion title="Pictures Links" icon="fa fa-picture-o">
-          <ul>
+        <Accordion title="About Us" icon="fa fa-picture-o">
+          <ul class="biography-list">
             <li>
-              <a href="https://www.freepik.com/free-vector/cute-cat-cartoon-character_45188752.htm#page=2&query=cat%20clipart&position=3&from_view=search&track=ais&uuid=234b2f64-1ae7-42ff-b5a9-f3a54eb7e393">
-                Image by brgfx
-              </a>{" "}
-              on Freepik
+              <p>
+                <strong>Sumeet Jena:</strong> I interned at Fisher Investments
+                in Dallas, Texas last summer and will be returning there
+                full-time this August in their Tampa office, as an Associate
+                Application Developer. In my free time, I’m a massive sports fan
+                and follow as many sports as I can. I also write about sports as
+                a hobby, which was a massive inspiration for this project.
+              </p>
             </li>
             <li>
-              <a href="https://www.freepik.com/free-vector/cute-black-kitten-sitting-pose_43941387.htm#page=2&query=cat&position=4&from_view=author&uuid=e2b6486b-a4a3-41b4-aa88-8ad098501516">
-                Image by brgfx
-              </a>{" "}
-              on Freepik
+              <p>
+                <strong>Ryan Campisi:</strong> After graduation, I will begin my
+                master’s in computer science at Georgia Tech. I have worked as a
+                mathematics tutor and teaching assistant throughout my four
+                years of undergrad, and I am currently wrapping up my first
+                mathematics thesis. I plan to one day return to academia, after
+                working in the CS industry for a bit, to pursue a PhD in
+                mathematics. My hobbies include playing chess, hiking, and
+                traveling.
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>Sufia Rashid:</strong> I currently work as a homeroom
+                teacher specifically catered to getting at-risk children back up
+                on their grade levels. I am about to become a mother soon so I
+                plan to take a few years off before delving into any employment
+                position or graduate studies. In my free time, I love to paint,
+                spend time with family, and help out in my community.
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>Ryan Kolb:</strong> This is my biography!
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>Namyung Yoo:</strong>I work within accounting at the UF
+                libraries and assist with the library database for acquisitions
+                and serials, and plan to work in the software industry after
+                graduation. I enjoy reading about history and the classics, as
+                well as learning new languages.
+              </p>
+            </li>
+          </ul>
+        </Accordion>
+        <Accordion title="Theme Demo (Coming soon...)" icon="fa fa-adjust">
+          <ul>
+            <li>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={isDarkMode}
+                  onChange={toggleDarkMode}
+                />
+                <span className="slider"></span>
+              </label>
             </li>
           </ul>
         </Accordion>
