@@ -246,8 +246,8 @@ const SettingsPage = ({ children, user }) => {
       <h1
         align="center"
         style={{
-          color: isDarkMode ? "white" : "#631d1d",
-          fontFamily: "'Times New Roman', Times, serif",
+          color: "black",
+          // fontFamily: "'Times New Roman', Times, serif",
           padding: "7px",
         }}
       >
@@ -256,11 +256,11 @@ const SettingsPage = ({ children, user }) => {
       <ol
         style={{
           color: "#000000d0",
-          fontFamily: "'Times New Roman', Times, serif",
+          // fontFamily: "'Times New Roman', Times, serif",
           fontSize: "150%",
         }}
       >
-        <Accordion title="Account Settings" icon="fa fa-address-card-o">
+        <Accordion title="Account Settings  " icon="fa fa-address-card-o">
           <ul>
             <li>
               <input
@@ -299,7 +299,7 @@ const SettingsPage = ({ children, user }) => {
             </li>
           </ul>
         </Accordion>
-        <Accordion title="Timezone Settings" icon="fa fa-clock-o">
+        <Accordion title="Timezone Settings  " icon="fa fa-clock-o">
           <ul>
             <li>
               <select
@@ -338,7 +338,7 @@ const SettingsPage = ({ children, user }) => {
             </li>
           </ul>
         </Accordion>
-        <Accordion title="Password Settings" icon="fa fa-lock">
+        <Accordion title="Password Settings  " icon="fa fa-lock">
           <ul>
             <li>
               <input
@@ -376,7 +376,7 @@ const SettingsPage = ({ children, user }) => {
             {passwordMessage && <li>{passwordMessage}</li>}
           </ul>
         </Accordion>
-        <Accordion title="About Us" icon="fa fa-picture-o">
+        <Accordion title="About Us  " icon="fa fa-users">
           <ul class="biography-list">
             <li>
               <p>
@@ -426,7 +426,7 @@ const SettingsPage = ({ children, user }) => {
             </li>
           </ul>
         </Accordion>
-        <Accordion title="Theme Demo (Coming soon...)" icon="fa fa-adjust">
+        <Accordion title="Theme Demo (Coming soon...)  " icon="fa fa-adjust">
           <ul>
             <li>
               <label className="toggle">
@@ -440,7 +440,7 @@ const SettingsPage = ({ children, user }) => {
             </li>
           </ul>
         </Accordion>
-        <Accordion title="Delete Account" icon="fa fa-picture-o">
+        <Accordion title="Delete Account  " icon="fa fa-trash">
           <ul>
             <li>
               <button onClick={handleDelete} className="btn custom-btn-green">

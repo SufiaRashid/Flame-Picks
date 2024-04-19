@@ -335,6 +335,7 @@ const HomePage = ({ isAuthenticated, user }) => {
 
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
+      <div className='homepage-container'> 
       <h5 align="center" style={{ color: 'rgb(43, 57, 55)', marginBottom: '40px', fontSize: '2.5rem' }}>
         This Week's Sports Picks
       </h5>
@@ -415,6 +416,7 @@ const HomePage = ({ isAuthenticated, user }) => {
           <p style={{ fontSize: '1.5rem' }}>Visit the "History" page to view your picks.</p>
         </div>
       )}
+      </div>
     </BaseLayout>
   );
 };

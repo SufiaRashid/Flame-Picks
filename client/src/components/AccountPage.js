@@ -18,7 +18,19 @@ const AccountPage = () => {
         favoriteNBATeam: viewID === '' ? authData.user?.favorite_nba_team : '' // Default favorite NBA team
     });
 
+    /*
+useEffect(() => {
+    document.body.classList.add("settings-page-bg");
+
+    return () => {
+      document.body.classList.remove("settings-page-bg");
+    };
+  }, []);
+
+    */
+
     useEffect(() => {
+        document.body.classList.add("account-page-bg")
         const getProfileInfo = async () => {
                 console.log("Viewing another user's profile: ", viewID);
                 setLoading(true);
@@ -44,6 +56,9 @@ const AccountPage = () => {
             getProfileInfo();
         else
             setUserInfo({username: authData.user?.firstName + " " + authData.user?.lastName, profilePicture: authData.user?.profile_picture, points: authData.user?.score, favoriteNFLTeam: authData.user?.favorite_nfl_team, favoriteNBATeam: authData.user?.favorite_nba_team});
+            return () => {
+                document.body.classList.remove("account-page-bg");
+            }
     }, [])
 
     const handleProfilePictureChange = async (e) => {
@@ -203,6 +218,9 @@ const AccountPage = () => {
                                 }}
                             />
                             )}
+                            <div>
+                                 
+                            </div>
                         <div className="profile-details">
                             <p className="info-label"><strong>Name:</strong> {viewID === '' ? authData.user?.firstName + " " + authData.user?.lastName : userInfo.username}</p>
                             <p className="info-label"><strong>Points:</strong> {viewID === '' ? authData.user?.score : userInfo.points}</p>

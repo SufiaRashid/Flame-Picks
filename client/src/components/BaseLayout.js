@@ -31,7 +31,7 @@ const BaseLayout = ({ children }) => {
     <>
       <nav
         className="navbar navbar-expand-lg navbar-light sticky-top"
-        style={{ backgroundColor: "#afd7d4" }}
+        style={{ backgroundColor: "#97bde0" }}
       >
         <div className="container-fluid">
           <button
@@ -56,31 +56,31 @@ const BaseLayout = ({ children }) => {
               {authData.isAuthenticated ? (
                 <>
                   <Link className="nav-item nav-link" to="/home" onClick={handleNavLinkClick}>
-                    <i className="fa fa-fw fa-home"></i> Make Picks
+                    <i className="fa fa-fw fa-home"></i> <strong>Make Picks</strong>
                   </Link>
                   <Link className="nav-item nav-link" to="/managepicks" onClick={handleNavLinkClick}>
-                    <i className="fa fa-fw fa-history"></i> History
+                    <i className="fa fa-fw fa-history"></i> <strong>History</strong>
                   </Link>
                   <Link className="nav-item nav-link" to="/leaderboard" onClick={handleNavLinkClick}>
-                    <i className="fa fa-fw fa-list"></i> LeaderBoard
+                    <i className="fa fa-fw fa-list"></i> <strong>LeaderBoard</strong>
                   </Link>
                   <Link className="nav-item nav-link" to="/account" onClick={handleNavLinkClick}>
-                    <i className="fa fa-fw fa-user"></i> Account
+                    <i className="fa fa-fw fa-user"></i> <strong>Account</strong>
                   </Link>
                   <Link className="nav-item nav-link" to="/settings" onClick={handleNavLinkClick}>
-                    <i className="fa fa-fw fa-cogs"></i> Settings
+                    <i className="fa fa-fw fa-cogs"></i> <strong>Settings</strong>
                   </Link>
                   <Link className="nav-item nav-link" to="/support" onClick={handleNavLinkClick}>
-                    <i className="fa fa-fw fa-wrench"></i> Support
+                    <i className="fa fa-fw fa-wrench"></i> <strong>Support</strong>
                   </Link>
                 </>
               ) : (
                 <>
                   <Link className="nav-item nav-link" to="/login">
-                    <i className="fa fa-fw fa-sign-in"></i> Login
+                    <i className="fa fa-fw fa-sign-in"></i> <strong>Login</strong>
                   </Link>
                   <Link className="nav-item nav-link" to="/sign-up">
-                    <i className="fa fa-fw fa-user-o"></i> Sign-Up
+                    <i className="fa fa-fw fa-user-o"></i> <strong>Sign-Up</strong>
                   </Link>
                 </>
               )}
@@ -95,7 +95,7 @@ const BaseLayout = ({ children }) => {
                   onClick={handleLogout}
                   style={{ boxShadow: "none" }}
                 >
-                  <i className="fa fa-fw fa-sign-out"></i> Logout
+                  <i className="fa fa-fw fa-sign-out"></i> <strong>Logout</strong>
                 </button>
               </div>
             )}

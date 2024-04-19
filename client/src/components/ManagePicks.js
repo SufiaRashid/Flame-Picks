@@ -141,7 +141,7 @@ const ManagePicks = () => {
 
   return (
     <BaseLayout>
-      <div>
+      <div className='history-container'>
         <h2>Your Picks</h2>
         <CompactTable columns={COLUMNS} data={data} theme={theme} sort={sort} />
         {isLoading ? (
