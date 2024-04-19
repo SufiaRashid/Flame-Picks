@@ -163,7 +163,8 @@ const HomePage = ({ isAuthenticated, user }) => {
   const [allPicksMade, setAllPicksMade] = useState({
     NBA: false,
     EPL: false,
-    MLB: false
+    MLB: false,
+    MLS: false
   });
 
   useEffect(() => {
@@ -361,6 +362,12 @@ const HomePage = ({ isAuthenticated, user }) => {
           onClick={() => setSetSelectedSport('MLB')}
         >
           MLB
+        </button>
+        <button
+          style={selectedSport === 'MLS' ? selectedSportButtonStyle  : sportButtonStyle}
+          onClick={() => setSetSelectedSport('MLS')}
+        >
+          MLS
         </button>
       </div>
       {loading ? (

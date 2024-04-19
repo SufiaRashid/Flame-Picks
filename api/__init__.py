@@ -53,19 +53,22 @@ def create_app():
         with app.app_context():
             function()
 
-    from .scrape import get_nba_games, get_epl_games, get_mlb_games, update_scores
+    from .scrape import get_nba_games, get_epl_games, get_mlb_games, get_mls_games, update_scores
 
     thread1 = threading.Thread(target=run_threaded_function, args=(get_nba_games,))
     thread2 = threading.Thread(target=run_threaded_function, args=(get_epl_games,))
     thread3 = threading.Thread(target=run_threaded_function, args=(get_mlb_games,))
+    thread4 = threading.Thread(target=run_threaded_function, args=(get_mls_games,))
 
     thread1.start()
     thread2.start()
     thread3.start()
+    thread4.start()
 
     thread1.join()
     thread2.join()
-    thread3.join() 
+    thread3.join()
+    thread4.join()
 
     with app.app_context():
         update_scores()
