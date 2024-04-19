@@ -59,6 +59,14 @@ const ManagePicks = () => {
         };
       });
   
+      enrichedPicks.sort((a, b) => {
+        const resultComparison = (a.result === null ? 0 : 1) - (b.result === null ? 0 : 1);
+        if (resultComparison !== 0) return -resultComparison;
+        const dateA = new Date(a.gameDate.split('/').reverse().join('/'));
+        const dateB = new Date(b.gameDate.split('/').reverse().join('/'));
+        return dateB - dateA;
+      });
+  
       setNodes(enrichedPicks);
       setGames(fetchedGames);
     } catch (error) {
@@ -78,7 +86,7 @@ const ManagePicks = () => {
         GAME: (array) => array.sort((a, b) => a.game.localeCompare(b.game)),
         PICKED_TEAM: (array) => array.sort((a, b) => a.picked_team.localeCompare(b.picked_team)),
         PICK_TIME: (array) => array.sort((a, b) => new Date(a.pick_time) - new Date(b.pick_time)),
-        RESULT: (array) => array.sort((a, b) => (a.result !== null ? a.result - b.result : -1)),
+        RESULT: (array) => array.sort((a, b) => (a.result !== null ? 1 : 0) - (b.result !== null ? 1 : 0)),
       },
     }
   );

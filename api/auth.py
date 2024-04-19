@@ -3,6 +3,7 @@ from flask_jwt_extended import create_access_token
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func
 
 
 auth = Blueprint('auth', __name__)
@@ -10,10 +11,10 @@ auth = Blueprint('auth', __name__)
 @auth.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    email = data.get('email')
+    email = data.get('email').lower()
     password = data.get('password')
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter(func.lower(User.email) == email).first()
     if user and check_password_hash(user.password, password):
         access_token = create_access_token(identity=email)
         return jsonify(access_token=access_token, user={"id": user.id, "firstName": user.firstName, "lastName": user.lastName, "email": user.email, "score": user.score, "profile_picture": user.profile_picture, "favorite_nba_team": user.favorite_nba_team, "favorite_nfl_team": user.favorite_nfl_team}), 200
@@ -22,7 +23,7 @@ def login():
 @auth.route('/sign-up', methods=['POST'])
 def sign_up():
     data = request.get_json()
-    email = data.get('email')
+    email = data.get('email').lower()
     first_name = data.get('firstName', '') 
     last_name = data.get('lastName', '')
     password1 = data.get('password1', '')
@@ -36,7 +37,7 @@ def sign_up():
     if len(password1) < 8:
         return jsonify({'error': 'Password must be at least 8 characters.'}), 400
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter(func.lower(User.email) == email).first()
     if user:
         return jsonify({'error': 'Email already in use.'}), 409
 

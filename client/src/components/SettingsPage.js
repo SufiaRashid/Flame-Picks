@@ -41,6 +41,8 @@ const SettingsPage = ({ children, user }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
+  const [deleteMessage, setDeleteMessage] = useState("");
+  const [timezoneMessage, setTimezoneMessage] = useState("");
   const { authData, logout, setAuthData } = useAuth();
   const [newFirstName, setNewFirstName] = useState("");
   const [newLastName, setNewLastName] = useState("");
@@ -127,12 +129,12 @@ const SettingsPage = ({ children, user }) => {
         }
       );
 
-      setUpdateMessage(response.data.message);
+      setTimezoneMessage(response.data.message);
     } catch (error) {
       if (error.response && error.response.data) {
-        setUpdateMessage(error.response.data.error);
+        setTimezoneMessage(error.response.data.error);
       } else {
-        setUpdateMessage("An error occurred. Please try again.");
+        setTimezoneMessage("An error occurred. Please try again.");
       }
     }
   };
@@ -148,6 +150,15 @@ const SettingsPage = ({ children, user }) => {
         setUpdateMessage("Please enter a valid email address.");
         return;
       }
+      const response = await axios.get(`http://localhost:5001/data/get-users?email=${newEmail.toLowerCase()}`);
+      const existingUser = response.data.find(user => user.email.toLowerCase() === newEmail.toLowerCase());
+      if (existingUser) {
+        console.log("The user exists")
+        setUpdateMessage("Email already taken.");
+        return;
+      }
+      else
+        console.log("The user does not exist")
     }
 
     try {
@@ -226,7 +237,7 @@ const SettingsPage = ({ children, user }) => {
         `http://localhost:5001/data/delete-user/${authData.user.id}`
       );
       console.log(response);
-      setUpdateMessage(response.data.message);
+      setDeleteMessage(response.data.message);
 
       logout();
       navigate("/login");
@@ -234,9 +245,9 @@ const SettingsPage = ({ children, user }) => {
       console.log(error);
 
       if (error.response && error.response.data) {
-        setUpdateMessage(error.response.data.error);
+        setDeleteMessage(error.response.data.error);
       } else {
-        setUpdateMessage("An error occurred. Please try again.");
+        setDeleteMessage("An error occurred. Please try again.");
       }
     }
   };
@@ -337,7 +348,7 @@ const SettingsPage = ({ children, user }) => {
               >
                 Update Timezone
               </button>
-              {updateMessage && <p>{updateMessage}</p>}
+              {timezoneMessage && <p>{timezoneMessage}</p>}
             </li>
           </ul>
         </Accordion>
@@ -418,7 +429,7 @@ const SettingsPage = ({ children, user }) => {
             </li>
             <li>
               <p>
-                <strong>Ryan Kolb:</strong> This is my biography!
+                <strong>Ryan Kolb:</strong> After graduation, I plan to go into IT and continue my education and pursue AWS certifications.
               </p>
             </li>
             <li>
@@ -454,7 +465,7 @@ const SettingsPage = ({ children, user }) => {
               </button>
             </li>
 
-            {updateMessage && <p>{updateMessage}</p>}
+            {deleteMessage && <p>{deleteMessage}</p>}
           </ul>
         </Accordion>
       </ol>

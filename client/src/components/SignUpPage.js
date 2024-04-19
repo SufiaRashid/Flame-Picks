@@ -77,11 +77,16 @@ const SignUpPage = ({ isAuthenticated, user }) => {
   return (
     <BaseLayout isAuthenticated={isAuthenticated} user={user}>
       <div align="center">
+        <img
+          src="/loginlogo.png"
+          style={{ width: "400px", height: "auto" }}
+          alt="Avatar"
+          className="avatar"
+        />
+      </div>
+      <div align="center">
       </div>
       <div>
-      <h3 align="center" style={{ color: "rgb(30, 139, 121)" }}>
-            SIGN UP
-          </h3>
         {message.content && (
           <div
             className={`alert ${

@@ -9,6 +9,7 @@ const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const { viewID, updateViewID } = useView();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     document.body.classList.add("account-page-bg")
@@ -23,11 +24,14 @@ const Leaderboard = () => {
             return percentageB - percentageA;
           });
           setLeaderboardData(sortedData);
+          setLoading(false);
         } else {
           console.error('Failed to fetch leaderboard data');
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error fetching leaderboard data:', error);
+        setLoading(false);
       }
     };
 
@@ -58,28 +62,32 @@ const Leaderboard = () => {
         {/*adjusted header with new class for styling*/}
         <h3 className="leaderboard-header">Leaderboards</h3>
         <div className="leaderboard-content">
-          <table className="leaderboard-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>User</th>
-                <th>Overall Record</th>
-                <th>Winning Percentage</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaderboardData.map((user, index) => (
-                <tr key={user.id}>
-                  <td>#{index + 1}</td>
-                  <td onClick={() => handleUserClick(user.id)} style={{ cursor: 'pointer' }}>
-                    {`${user.firstName} ${user.lastName}`}
-                  </td>
-                  <td>{user.score} - {user.losses}</td>
-                  <td>{calculatePercentage(user.score, user.losses)}%</td>
+          {loading ? (
+            <p>Loading leaderboard...</p>
+          ) : (
+            <table className="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>User</th>
+                  <th>Overall Record</th>
+                  <th>Winning Percentage</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {leaderboardData.map((user, index) => (
+                  <tr key={user.id}>
+                    <td>#{index + 1}</td>
+                    <td onClick={() => handleUserClick(user.id)} style={{ cursor: 'pointer' }}>
+                      {`${user.firstName} ${user.lastName}`}
+                    </td>
+                    <td>{user.score} - {user.losses}</td>
+                    <td>{calculatePercentage(user.score, user.losses)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </BaseLayout>

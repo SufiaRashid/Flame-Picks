@@ -358,16 +358,16 @@ const HomePage = ({ isAuthenticated, user }) => {
           EPL
         </button>
         <button
-          style={selectedSport === 'MLB' ? selectedSportButtonStyle  : sportButtonStyle}
-          onClick={() => setSetSelectedSport('MLB')}
-        >
-          MLB
-        </button>
-        <button
           style={selectedSport === 'MLS' ? selectedSportButtonStyle  : sportButtonStyle}
           onClick={() => setSetSelectedSport('MLS')}
         >
           MLS
+        </button>
+        <button
+          style={selectedSport === 'MLB' ? selectedSportButtonStyle  : sportButtonStyle}
+          onClick={() => setSetSelectedSport('MLB')}
+        >
+          MLB
         </button>
       </div>
       {loading ? (
@@ -403,7 +403,7 @@ const HomePage = ({ isAuthenticated, user }) => {
                       };
                     });
                   }}
-                  isEPL={selectedSport === 'EPL'}
+                  isEPL={(selectedSport === 'EPL' || selectedSport === 'MLS')}
                   isLoading={loading}
                 />
               ))}
