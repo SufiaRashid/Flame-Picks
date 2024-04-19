@@ -265,6 +265,7 @@ const SettingsPage = ({ children, user }) => {
             <li>
               <input
                 type="text"
+                class="input-default-font"
                 placeholder={authData.user?.firstName}
                 value={newFirstName}
                 onChange={(e) => setNewFirstName(e.target.value)}
@@ -273,6 +274,7 @@ const SettingsPage = ({ children, user }) => {
             <li>
               <input
                 type="text"
+                class="input-default-font"
                 placeholder={authData.user?.lastName}
                 value={newLastName}
                 onChange={(e) => setNewLastName(e.target.value)}
@@ -281,6 +283,7 @@ const SettingsPage = ({ children, user }) => {
             <li>
               <input
                 type="email"
+                class="input-default-font"
                 placeholder={authData.user?.email}
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
@@ -343,6 +346,7 @@ const SettingsPage = ({ children, user }) => {
             <li>
               <input
                 type="password"
+                class="input-default-font"
                 placeholder="Old Password"
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
@@ -351,6 +355,7 @@ const SettingsPage = ({ children, user }) => {
             <li>
               <input
                 type="password"
+                class="input-default-font"
                 placeholder="New Password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -359,6 +364,7 @@ const SettingsPage = ({ children, user }) => {
             <li>
               <input
                 type="password"
+                class="input-default-font"
                 placeholder="Confirm New Password"
                 value={confirmNewPassword}
                 onChange={(e) => setConfirmNewPassword(e.target.value)}

@@ -96,13 +96,13 @@ const SupportPage = () => {
             <form className="contact-form" onSubmit={handleSubmit}>
               <input 
                 type="email" 
-                className="form-input" 
+                className="form-input input-default-font" 
                 placeholder="Your email" 
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
               />
               <textarea 
-                className="form-textarea" 
+                className="form-textarea input-default-font" 
                 placeholder="Your message" 
                 value={message} 
                 onChange={(e) => setMessage(e.target.value)} 

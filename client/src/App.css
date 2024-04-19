@@ -7,6 +7,12 @@ body {
   font-size: 24px;
 }
 
+.input-default-font {
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  font-size: 16px;
+}
+
 .App {
   text-align: center;
 }

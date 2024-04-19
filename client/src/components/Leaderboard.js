@@ -11,6 +11,7 @@ const Leaderboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.body.classList.add("account-page-bg")
     const fetchLeaderboardData = async () => {
       try {
         //backend server address
@@ -31,6 +32,9 @@ const Leaderboard = () => {
     };
 
     fetchLeaderboardData();
+    return () => {
+      document.body.classList.remove("account-page-bg")
+    }
   }, [viewID]);
 
   const handleUserClick = (id) => {

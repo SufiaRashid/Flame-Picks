@@ -29,7 +29,11 @@ const ManagePicks = () => {
   const [deletingIds, setDeletingIds] = useState(new Set());
 
   useEffect(() => {
+    document.body.classList.add("account-page-bg")
     fetchGamesAndPicks();
+    return () => {
+      document.body.classList.remove("account-page-bg")
+    }
   }, []);
   const fetchGamesAndPicks = async () => {
     setIsLoading(true);

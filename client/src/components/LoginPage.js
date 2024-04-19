@@ -86,7 +86,7 @@ const LoginPage = () => {
             <label htmlFor="email">Email Address</label>
             <input
               type="email"
-              className="form-control"
+              className="form-control input-default-font"
               id="email"
               name="email"
               placeholder="Enter email"
@@ -98,7 +98,7 @@ const LoginPage = () => {
             <label htmlFor="password">Password</label>
             <input
               type="password"
-              className="form-control"
+              className="form-control input-default-font"
               id="password"
               name="password"
               placeholder="Enter password"

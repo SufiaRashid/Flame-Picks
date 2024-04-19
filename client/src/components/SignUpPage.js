@@ -97,7 +97,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
             <label htmlFor="email">Email Address</label>
             <input
               type="email"
-              className="form-control"
+              className="form-control input-default-font"
               id="email"
               name="email"
               placeholder="Enter email"
@@ -109,7 +109,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
             <label htmlFor="firstName">First Name</label>
             <input
               type="text"
-              className="form-control"
+              className="form-control input-default-font"
               id="firstName"
               name="firstName"
               placeholder="Enter first name"
@@ -121,7 +121,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
             <label htmlFor="lastName">Last Name</label>
             <input
               type="text"
-              className="form-control"
+              className="form-control input-default-font"
               id="lastName"
               name="lastName"
               placeholder="Enter last name"
@@ -133,7 +133,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
             <label htmlFor="password1">Password</label>
             <input
               type="password"
-              className="form-control"
+              className="form-control input-default-font"
               id="password1"
               name="password1"
               placeholder="Enter password"
@@ -145,7 +145,7 @@ const SignUpPage = ({ isAuthenticated, user }) => {
             <label htmlFor="password2">Password (Confirm)</label>
             <input
               type="password"
-              className="form-control"
+              className="form-control input-default-font"
               id="password2"
               name="password2"
               placeholder="Re-enter password"

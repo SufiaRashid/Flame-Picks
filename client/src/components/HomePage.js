@@ -167,6 +167,7 @@ const HomePage = ({ isAuthenticated, user }) => {
   });
 
   useEffect(() => {
+    document.body.classList.add("account-page-bg")
     const fetchAndGroupEventsByDate = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -239,6 +240,9 @@ const HomePage = ({ isAuthenticated, user }) => {
     };
   
     fetchAndGroupEventsByDate();
+    return () => {
+      document.body.classList.remove("account-page-bg")
+    }
 
   }, [selectedSport]);
 
