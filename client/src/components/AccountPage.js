@@ -222,10 +222,10 @@ useEffect(() => {
                                  
                             </div>
                         <div className="profile-details">
-                            <p className="info-label"><strong>Name:</strong> {viewID === '' ? authData.user?.firstName + " " + authData.user?.lastName : userInfo.username}</p>
-                            <p className="info-label"><strong>Points:</strong> {viewID === '' ? authData.user?.score : userInfo.points}</p>
+                            <p className="info-name">{viewID === '' ? authData.user?.firstName + " " + authData.user?.lastName : userInfo.username}</p>
+                            <p className="info-label">Points: {viewID === '' ? authData.user?.score : userInfo.points}</p>
                             <h3 className="info-title">Favorite Teams:</h3>
-                            <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+                            <ul className = "subinfo-title" style={{ listStyleType: 'none', paddingLeft: '0' }}>
                                 {((viewID === '' || viewID === authData.user?.id)) && authData.user?.favorite_nfl_team &&(
                                     <>
                                         <li>{authData.user?.favorite_nfl_team} (NFL)</li>

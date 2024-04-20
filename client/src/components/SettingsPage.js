@@ -262,7 +262,7 @@ const SettingsPage = ({ children, user }) => {
           padding: "7px",
         }}
       >
-        Settings Page
+        Settings
       </h1>
       <ol
         style={{
@@ -394,7 +394,7 @@ const SettingsPage = ({ children, user }) => {
           </ul>
         </Accordion>
         <Accordion title="About Us  " icon="fa fa-users">
-          <ul class="biography-list">
+          <ul class="biography-list input-default-font">
             <li>
               <p>
                 <strong>Sumeet Jena:</strong> I interned at Fisher Investments
@@ -434,7 +434,7 @@ const SettingsPage = ({ children, user }) => {
             </li>
             <li>
               <p>
-                <strong>Namyung Yoo:</strong>I work within accounting at the UF
+                <strong>Namyung Yoo:</strong> I work within accounting at the UF
                 libraries and assist with the library database for acquisitions
                 and serials, and plan to work in the software industry after
                 graduation. I enjoy reading about history and the classics, as

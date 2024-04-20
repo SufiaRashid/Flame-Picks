@@ -60,7 +60,7 @@ const Leaderboard = () => {
     <BaseLayout>
       <div className="leaderboard-container">
         {/*adjusted header with new class for styling*/}
-        <h3 className="leaderboard-header">Leaderboards</h3>
+        <h3 style={{ fontSize: "32px" }}>Leaderboard</h3>
         <div className="leaderboard-content">
           {loading ? (
             <p>Loading leaderboard...</p>

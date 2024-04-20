@@ -46,8 +46,8 @@ const SupportPage = () => {
   const [toastMessage, setToastMessage] = useState('');
   const faqs = [
     { id: 1, question: "How do I reset my password?", answer: "Go to your settings page and click on 'Reset Password.'" },
-    { id: 2, question: "Where can I find my pick history?", answer: "Your past picks can be viewed in the 'Pick History' section the webpage." },
-    { id: 3, question: "How do I contact support?", answer: "You can contact us via the support form on this page or directly email us at support@example.com." }
+    { id: 2, question: "Where can I find my pick history?", answer: "Your past picks can be viewed in the 'Pick History' section the webpage."},
+    { id: 3, question: "How do I contact support?", answer: "You can contact us via the support form on this page or directly email us at FlamePicksHelp@gmail.com." }
   ];
 
   useEffect(() => {

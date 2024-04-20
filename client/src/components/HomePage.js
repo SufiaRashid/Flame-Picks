@@ -18,7 +18,7 @@ const buttonStyle = {
   height: '50px',
   margin: '0 10px',
   padding: '40px 5px',
-  fontSize: '1.5rem',
+  fontSize: '1.8rem',
   fontWeight: 'bold',
   cursor: 'pointer',
   border: '1px solid #ccc',
@@ -34,10 +34,10 @@ const buttonStyle = {
 const drawButtonStyle = {
   ...buttonStyle,
   padding: '10px 20px',
-  fontSize: '0.8rem',
+  fontSize: '1rem',
   margin: '5px auto 0',
-  width: '60px',
-  height: '30px',
+  width: '80px',
+  height: '40px',
 };
 
 const selectedButtonStyle = {
@@ -50,7 +50,7 @@ const selectedButtonStyle = {
 const sportButtonStyle = {
   ...buttonStyle,
   padding: '10px',
-  fontSize: '1rem',
+  fontSize: '1.5rem',
   width: 'auto',
   margin: '0 5px',
 };
@@ -58,7 +58,7 @@ const sportButtonStyle = {
 const selectedSportButtonStyle = {
   ...selectedButtonStyle,
   padding: '10px',
-  fontSize: '1rem',
+  fontSize: '1.5rem',
 };
 
 
@@ -124,7 +124,7 @@ const MatchPick = ({ homeTeam, awayTeam, gameid, onPickSelected, isEPL, isLoadin
 
 const makePicksButtonStyle = {
   padding: '20px 40px',
-  fontSize: '1.2rem',
+  fontSize: '1.5rem',
   fontWeight: 'bold',
   cursor: 'pointer',
   border: 'none',
