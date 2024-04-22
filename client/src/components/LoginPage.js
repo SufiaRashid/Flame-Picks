@@ -136,7 +136,7 @@ const LoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="form-group">
+            <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -153,8 +153,11 @@ const LoginPage = () => {
             <i className="fa fa-fw fa-sign-in"></i>Login
           </button>
 	    
+	  <div>
+		or
+	  </div>
 	    <GoogleOAuthProvider clientId="568931453378-cplin3lfuet71r1um1qdihotjlv3hhbk.apps.googleusercontent.com">
-		<GoogleLogin onSuccess={googleSubmit} onError={googleError}/>
+		<GoogleLogin onSuccess={googleSubmit} onError={googleError} containerProps={{ style: { width:"17%" } }}/>
 	  </GoogleOAuthProvider>
         </form>
       </div>
