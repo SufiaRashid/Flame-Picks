@@ -35,18 +35,18 @@ def google_login():
     header = jwt.get_unverified_header(jwt_token)
     key = jwks_client.get_signing_key(header["kid"]).key
     jwt_payload = jwt.decode(jwt_token, key, [header["alg"]], options={"verify_aud":False})
-    print("jwt_info: ")
-    print(jwt_payload, flush = True)
-
-    existing_user = User.query.filter_by(email=jwt_payload["email"]).first()
-    if not existing_user:
+    
+    access_token = create_access_token(identity=jwt_payload["email"])
+    user = User.query.filter_by(email=jwt_payload["email"]).first()
+    if not user:
         new_user = User(email=jwt_payload["email"], firstName=jwt_payload["given_name"], lastName=jwt_payload["family_name"],
         password=generate_password_hash(jwt_payload["sub"], method='pbkdf2:sha256'))
         db.session.add(new_user)
         db.session.commit()
-        
-    access_token = create_access_token(identity=jwt_payload["email"])
-    return jsonify(access_token=access_token, user={"firstName" : jwt_payload["given_name"], "lastName" : jwt_payload["family_name"], "email": jwt_payload["email"]}), 200
+        return jsonify(access_token=access_token, user={"firstName" : jwt_payload["given_name"], "lastName" : jwt_payload["family_name"], "email": jwt_payload["email"], }), 200
+
+    return jsonify(access_token=access_token, user={"id": user.id, "firstName": user.firstName, "lastName": user.lastName, "email": user.email, "score": user.score, "profile_picture": user.profile_picture, "favorite_nba_team": user.favorite_nba_team, "favorite_nfl_team": user.favorite_nfl_team}), 200
+
 
 @auth.route('/sign-up', methods=['POST'])
 def sign_up():

@@ -28,12 +28,7 @@ const LoginPage = () => {
     	    const googleCredential = await axios.post("http://127.0.0.1:5001/google-login",
 						      {id_token : googleResponse.credential}
 						     );
-	    console.log("Google Info:");
-	    console.log(googleCredential);   
 	    const { access_token, user } = googleCredential.data;
-	    console.log("access_token and user:");
-	    console.log(access_token);
-	    console.log(user);
 
 	    setMessage({
 		type: "success",
